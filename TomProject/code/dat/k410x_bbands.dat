@@ -1,0 +1,43 @@
+runfile('F:/zwPython/zw_k23/k410x_bbands.py', wdir='F:/zwPython/zw_k23')
+::lower,upper,n,shares,dprice,dcash
+
+
+2011-07-20 ++ $14.09,$16.38,n,0,$13.48,$1000000.00,@pos,{},nBuy,74183
+DEBUG: [1] for 74183 share/s
+2011-07-21  [DEBUG] Not enough cash [1] for 74183 share/s
+
+2011-07-21 ++ $13.96,$16.39,n,0,$13.59,$1000000.00,@pos,{},nBuy,73583
+DEBUG: [2] for 73583 share/s
+2011-07-22  [DEBUG] Not enough cash [2] for 73583 share/s
+
+2011-07-25 ++ $13.78,$16.34,n,0,$13.69,$1000000.00,@pos,{},nBuy,73046
+DEBUG: [3] for 73046 share/s
+2011-07-26  [DEBUG] Not enough cash [3] for 73046 share/s
+
+2011-07-27 ++ $13.67,$16.20,n,0,$13.59,$1000000.00,@pos,{},nBuy,73583
+DEBUG: [4] for 73583 share/s
+2011-07-28  [DEBUG] Not enough cash [4] for 73583 share/s
+
+2011-07-28 ++ $13.57,$16.18,n,0,$13.50,$1000000.00,@pos,{},nBuy,74074
+DEBUG: [5] for 74074 share/s
+2011-07-29  [DEBUG] Not enough cash [5] for 74074 share/s
+
+2011-07-29 ++ $13.44,$16.17,n,0,$13.10,$1000000.00,@pos,{},nBuy,76335
+DEBUG: [6] for 76335 share/s
+2011-08-01  [DEBUG] Not enough cash [6] for 76335 share/s
+
+2011-08-01 ++ $13.30,$16.18,n,0,$13.10,$1000000.00,@pos,{},nBuy,76335
+
+2011-09-15 -- $11.69,$14.88,n,76335,$14.89,$10698.40,@pos,{'yhoo': 76335}
+
+2012-02-17 ++ $15.15,$16.34,n,0,$15.01,$1162593.55,@pos,{},nBuy,77454
+DEBUG: [9] for 77454 share/s
+2012-02-21  [DEBUG] Not enough cash [9] for 77454 share/s
+
+2012-02-21 ++ $15.05,$16.38,n,0,$14.75,$1162593.55,@pos,{},nBuy,78819
+
+2012-06-29 -- $14.99,$15.76,n,78819,$15.83,$5530.63,@pos,{'yhoo': 78819}
+
+2012-08-10 ++ $15.27,$16.21,n,0,$15.15,$1250870.83,@pos,{},nBuy,82565
+
+2012-10-23 -- $14.72,$16.60,n,82565,$16.67,$9918.88,@pos,{'yhoo': 82565}
