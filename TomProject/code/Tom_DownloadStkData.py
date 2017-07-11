@@ -20,10 +20,11 @@ if 'windows' in platform.system():
     system = 'windows'
     s = '/'
 else :
-    system = 'other system';
+    system = 'other system'
     s = '\\'
 
 path = sys.path[0]
+path = os.path.abspath('Tom_Download')
 dataHome = 'data'
 
 
