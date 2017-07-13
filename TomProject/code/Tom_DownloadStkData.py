@@ -86,9 +86,8 @@ def downInxFromFile(filePath, cycle):
     qx=zw.zwDatX(zw._rdatCN);
     zwx.down_stk_inx(qx, filePath)
     
-    
 
 
-    
+
 
  
