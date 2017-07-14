@@ -4,7 +4,7 @@
    zwQT策略库课程模版文件
    
 '''
-
+import os, sys
 import numpy as np
 import pandas as pd
 
@@ -73,7 +73,8 @@ def sta00_dataPre(qx,xnam0,ksgn0):
         if qx.debugMod>0:
             print(d20.tail())    
             #---
-            fss='tmp\\'+qx.prjName+'_'+xcod+'.csv'
+            #fss='tmp\\'+qx.prjName+'_'+xcod+'.csv'
+            fss=os.path.join('tmp',qx.prjName+'_'+xcod+'.csv')
             d20.to_csv(fss)   
     
    

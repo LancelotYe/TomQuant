@@ -154,7 +154,7 @@ def xtick_down8tim_all(qx,finx):
         qx.xdayInx,qx.xtimSgn=tc,qx.DTxtim.strftime('%Y-%m-%d'); 
         #
         rmon0=qx.DTxtim.strftime('%Y-%m'); 
-        qx.rtickTimMon='%s%s\\' %(qx.rtickTim,rmon0)
+        qx.rtickTimMon='%s%s' %(qx.rtickTim,rmon0)
         xfg=os.path.exists(qx.rtickTimMon);
         if not xfg:
             os.mkdir(qx.rtickTimMon)
@@ -188,11 +188,14 @@ def xtick2tim_code010(qx):
         #默认=False，tick数据追加模式标志,如果=True,强行将所有tick文件转换为分时数据
         if qx.xtickAppFlag:
             
-            fss=zw._rdatTick+qx.code+'\\'+qx.xtim+'.csv'
+            #fss=zw._rdatTick+qx.code+'\\'+qx.xtim+'.csv'
+            fss=os.path.join(zw._rdatTick+qx.code,qx.tim+'.csv')
+            
             xfg=os.path.exists(fss);
             if xfg:qx.datMin[ksgn]=pd.read_csv(fss,index_col=False)
     #
-    flst=os.listdir(zw._rdatTick+qx.code+'\\')
+    #flst=os.listdir(zw._rdatTick+qx.code+'\\')
+    flst=os.listdir(zw._rdatTick+qx.code)
     qx.codeCnt,qx.codeNum=0,len(flst)
     for fs0 in flst:
         qx.codeCnt+=1;nday=qx.codeNum-qx.codeCnt
@@ -223,7 +226,8 @@ def xtick2minWr(qx,rsk):
         xdf=np.round(xdf,2)
         xdf=xdf.sort_values(by=['time'],ascending=False)
         #fss=zw._rdatMin+sgnMin+'\\'+qx.code+'.csv';print(fss)
-        fss=rsk+sgnMin+'\\'+qx.code+'.csv';print(fss)
+        #fss=rsk+sgnMin+'\\'+qx.code+'.csv';print(fss)
+        fss=os.path.join(rsk+sgnMin,qx.code+'.csv');print(fss)
         if len(xdf)>3:
             xdf.to_csv(fss,columns=zw.qxMinName,index=False,encoding='utf') 
         qx.datMin[sgnMin]=xdf            
@@ -309,7 +313,7 @@ def xtick2tim_nday(qx):
         qx.xdayInx,qx.xtimSgn=tc,qx.DTxtim.strftime('%Y-%m-%d'); 
         #
         rmon0=qx.DTxtim.strftime('%Y-%m'); 
-        qx.rtickTimMon='%s%s\\' %(qx.rtickTim,rmon0)
+        qx.rtickTimMon='%s%s' %(qx.rtickTim,rmon0)
         fdat='%s%s_%s.csv'%(qx.rtickTimMon,qx.code,qx.xtimSgn);
         #
         print(qx.xdayInx,'/',qx.xdayNum,qx.xtimSgn,fdat)
@@ -331,7 +335,8 @@ def xtick2tim_code100(qx):
     '''
     for kss in qx.min_ksgns: 
         qx.min_knum,qx.min_ksgnWrk,ksgn=int(kss),'M'+kss,'M'+kss
-        qx.rminWrk='%s\\%s\\'%(qx.rmin0k,qx.min_ksgnWrk);
+        #qx.rminWrk='%s\\%s\\'%(qx.rmin0k,qx.min_ksgnWrk);
+        qx.rminWrk=os.path.join(qx.rmin0k,qx.min_ksgnWrk)
         if not os.path.exists(qx.rminWrk):os.mkdir(qx.rminWrk)
         #
         qx.datMin[ksgn]=pd.DataFrame(columns=zw.qxMinName);        
@@ -419,13 +424,15 @@ def xtick_real_down_all(qx,finx):
         #---
         df=xtick_real_downsub(code)
         if len(df)>10:
-            fss=rdat+'tick\\'+qx.code+'.csv';print('\n',fss)
+            #fss=rdat+'tick\\'+qx.code+'.csv';print('\n',fss)
+            fss=os.path.join(rdat,'tick',qx.code+'.csv');print('\n',fss)
             df.to_csv(fss,index=False,encoding='utf') 
             qx.datTick=df
             #---------- tick 分笔数据，转换为分时数据：05,15,30,60
             for kss in qx.min_ksgns: #qx.min_ksgns=['M05','M15','M30','M60']
                 qx.min_knum,qx.min_ksgnWrk,ksgn=int(kss),'M'+kss,'M'+kss
-                qx.rminWrk='%s\\%s\\'%(qx.rmin0k,qx.min_ksgnWrk);
+                #qx.rminWrk='%s\\%s\\'%(qx.rmin0k,qx.min_ksgnWrk);
+                qx.rminWrk=os.path.join(qx.rmin0k, qx.min_ksgnWrk)
                 if not os.path.exists(qx.rminWrk):os.mkdir(qx.rminWrk)
                 #
                 #sgnMin='M'+ksgn0;qx.minType=int(ksgn0);       # print('@mt',qx.minType)
@@ -496,9 +503,10 @@ def down_stk_cn010(qx):
         os.makedirs(rss);
     
     #tim0='1994-01-01';#tim0='2012-01-01';
-    tim0='2017-01-01';
+    tim0='2016-01-01';
     #
-    fss=rss+xcod+'.csv'
+    #fss=rss+xcod+'.csv'
+    fss=os.path.join(rss,xcod+'.csv')
     #-------------------
     #warning Tom change 6/24
 
@@ -782,7 +790,6 @@ def stkLibGetTimX(xcod):
         xcod (int): 股票代码
         '''
     d10=zw.stkLib[xcod]
-    d01=d10.index;
     xtim0=d01[0];
     xtim9=d01[-1];
     #xtim0s=xtim0.strftime()

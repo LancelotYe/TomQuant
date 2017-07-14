@@ -49,7 +49,8 @@ def xtick_down200(qx):
             time,price,change,volume,amount,type
             输出目录:\zwdat\tick\code\xtim ，code，xtim根据各个股票不同而变化
             '''
-    fss=qx.rdat+qx.code+'\\'+qx.xtim+'.csv'
+    #fss=qx.rdat+qx.code+'\\'+qx.xtim+'.csv'
+    fss=os.path.join(qx.rdat,qx.code,qx.xtim+'.csv')
     xfg=os.path.exists(fss);
     if not xfg:
         df = ts.get_tick_data(qx.code,date=qx.xtim)
@@ -75,7 +76,8 @@ def xtick_setTimeDat(qx):
     '''
     for ksgn0 in qx.min_ksgns: #qx.min_ksgns=['M05','M15','M30','M60']
         ksgn='M'+ksgn0;
-        fss=zw._rdatMin+ksgn+'\\'+qx.code+'.csv'
+        #fss=zw._rdatMin+ksgn+'\\'+qx.code+'.csv'
+        fss=os.path.join(zw._rdatMin,ksgn,qx.code+'.csv')
         xfg=os.path.exists(fss);    #print('@xf',xfg,xday,fss,xcod,xtim)
         if xfg:
             df=pd.read_csv(fss,index_col=False,encoding='utf') 
@@ -199,7 +201,8 @@ def xtick_xminWr(qx):
         xdf.drop_duplicates(subset='time', keep='last', inplace=True);
         xdf=np.round(xdf,2)
         xdf=xdf.sort_values(by=['time'],ascending=False)
-        fss=qx.rdat+sgnMin+'\\'+qx.code+'.csv';print(fss)
+        #fss=qx.rdat+sgnMin+'\\'+qx.code+'.csv';print(fss)
+        fss=os.path.join(qx.rdat,sgnMin,qx.code+'.csv');print(fss)
         xdf.to_csv(fss,columns=zw.qxMinName,index=False,encoding='utf') 
         qx.datMin[sgnMin]=xdf
     
@@ -298,7 +301,8 @@ def xtick2_down_all(qx,finx):
         code="%06d" %xc
         #code=zwTools.v2sk(xc,6);
         print("\n",i,"/",xn9,"code,",code)
-        rss,qx.code=qx.rdat+code+'\\',code
+        #rss,qx.code=qx.rdat+code+'\\',code
+        rss,qx.code=os.path.join(qx.rdat,code+os.sep),code
         xfg=os.path.exists(rss);  
         print(xfg,rss)
         #---
@@ -334,7 +338,8 @@ def xtick_down_all_real(qx,finx):
         df=xtick_downsub(code,'')
         if len(df)>10:
             #print(len(df),qx.fn_tick,'\n',df.head())
-            fss=qx.rdat+'tick\\'+qx.code+'.csv';print('\n',fss)
+            #fss=qx.rdat+'tick\\'+qx.code+'.csv';print('\n',fss)
+            fss=os.path.join(qx.rdat,'tick'+qx.code+'.csv');print('\n',fss)
             df.to_csv(fss,index=False,encoding='utf') 
             qx.datTick=df
             #---------- tick 分笔数据，转换为分时数据：05,15,30,60

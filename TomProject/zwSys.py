@@ -46,7 +46,7 @@ _corBlueCV=(255,0,0)
 #----init
 
 #----init.dir 目录设置
-
+'''
 _rdat0="zwDat/"
 _rdatCN=_rdat0+"cn/"
 _rdatUS=_rdat0+"us/"
@@ -54,11 +54,19 @@ _rdatInx=_rdat0+"inx/"
 _rdatMin=_rdat0+"min/"
 _rdatTick=_rdat0+"tick/"
 _rdatTickReal=_rdat0+"tickreal/"
+'''
+_rdat0=os.path.join(os.pardir,'zwDat')
+_rdatCN=os.path.join(_rdat0,'cn'+os.sep)
+_rdatUS=os.path.join(_rdat0,'us'+os.sep)
+_rdatInx=os.path.join(_rdat0,'inx'+os.sep)
+_rdatMin=os.path.join(_rdat0,'min'+os.sep)
+_rdatTick=os.path.join(_rdat0,'tick'+os.sep)
+_rdatTickReal=os.path.join(_rdat0, 'tickreal'+os.sep)
+print(_rdatCN)
+_rdatZW=os.path.join(_rdat0,'zw'+os.sep)
 
-_rdatZW=_rdat0+"zw/"
-
-_rTmp="/zwPython/zwQuant/demo/tmp/"
-
+_rTmp=os.path.join('zwPython','zwQuant','demo','tmp'+os.sep)
+print(_rTmp)
 
 #----init.stk.var 初始化数据设置
 _stkTradeTaxi=0.002
@@ -140,8 +148,12 @@ class zwQuantX(object):
 
         #taxi,佣金，扣税;
         self.prjName=prjNam;
+        '''
         self.fn_qxLib='tmp/'+prjNam+'_qxLib.csv';
         self.fn_xtrdLib='tmp/'+prjNam+'_xtrdLib.csv';
+        '''
+        self.fn_qxLib=os.path.join('tmp', prjNam, '_qxLib.csv')
+        self.fn_xtrdLib=os.path.join('tmp', prjNam, '_xtrdLib.csv')
         #---
         self.mbase=dbase0;
         self.money=dbase0;
@@ -358,8 +370,10 @@ class zwDatX(object):
     def __init__(self,rs0=_rdat0):  
         #----tick5.rss
         self.rdat=rs0;                  #   \zwDat\
-        self.rtickTim=rs0+'tick/';  #   \zwDat\ticktim\  2012-01\
-        self.rtickTimMon=self.rtickTim+'2010-01/';  #   \zwDat\ticktim\  2012-01\
+        #self.rtickTim=rs0+'tick/'; 
+        #self.rtickTimMon=self.rtickTim+'2010-01/'; 
+        self.rtickTim=os.path.join(rs0, 'tick')  #   \zwDat\ticktim\  2012-01\
+        self.rtickTimMon=os.path.join(self.rtickTim, '2010-01');  #   \zwDat\ticktim\  2012-01\
         # xxx.lib
         self.stkCodeLib=[]
         # fn_xxx
@@ -388,7 +402,8 @@ class zwDatX(object):
         self.codeInx0k=-1
         #
         self.rmin0k=_rdatMin;
-        self.rminWrk=self.rmin0k+'M05/'
+        #self.rminWrk=self.rmin0k+'M05/'
+        self.rminWrk=os.path.join(self.rmin0k, 'M05')
         
         #self.fn_min=[]
         self.min_ksgns=['05','15','30','60'] #分时数据时间模式列表，一般是[5，15，30，60]，也可以自行设置
@@ -419,13 +434,20 @@ class zwDatX(object):
         
         
         self.rdatZW=_rdatZW;
+        '''
         self.rZWcnXDay=_rdatZW+"cnXDay/"
         self.rZWcnDay=_rdatZW+"cnDay/"
         self.rZWusDay=_rdatZW+"usDay/"
         #
         self.rDay=rs0+"day/" 
         self.rXDay=rs0+"xday/"
-        
+        '''
+        self.rZWcnXDay=os.path.join(_rdatZW, 'cnXDay')
+        self.rZWcnDay=os.path.join(_rdatZW, 'cnDay')
+        self.rZWusDay=os.path.join(_rdatZW, 'usDay')
+        #
+        self.rDay=os.path.join(rs0, 'day')
+        self.rXDay=os.path.join(rs0, 'xday')
         #self.rDay9=rs0+"day9\\" #?????
         
         #  min.dat

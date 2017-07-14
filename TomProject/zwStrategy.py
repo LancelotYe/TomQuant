@@ -13,7 +13,7 @@
   
 '''
 
-
+import os, sys
 import numpy as np
 import math
 import pandas as pd
@@ -69,7 +69,8 @@ def SMA_dataPre(qx,xnam0,ksgn0):
         if qx.debugMod>0:
             print(d20.tail())    
             #---
-            fss='tmp\\'+qx.prjName+'_'+xcod+'.csv'
+            #fss='tmp\\'+qx.prjName+'_'+xcod+'.csv'
+            fss=os.path.join('tmp',qx.prjName+'_'+xcod+'.csv')
             d20.to_csv(fss)      
         
 def SMA_sta(qx):
@@ -129,7 +130,8 @@ def SMA20_dataPre(qx,xnam0,ksgn0):
         if qx.debugMod>0:
             print(d20.tail())    
             #---
-            fss='tmp\\'+qx.prjName+'_'+xcod+'.csv'
+            #fss='tmp\\'+qx.prjName+'_'+xcod+'.csv'
+            fss=os.path.join('tmp' + qx.prjName+'_'+'.csv')
             d20.to_csv(fss) 
             
 def SMA20_sta(qx):
@@ -196,7 +198,8 @@ def CMA_dataPre(qx,xnam0,ksgn0):
         zw.stkLib[xcod]=d20;
         if qx.debugMod>0:
             print(d20.tail())
-            fss='tmp\\'+qx.prjName+'_'+xcod+'.csv'
+            #fss='tmp\\'+qx.prjName+'_'+xcod+'.csv'
+            fss=os.path.join('tmp',qx.prjName+'_'+xcod+'.csv')
             d20.to_csv(fss)
     
     
@@ -282,7 +285,8 @@ def VWAP_dataPre(qx,xnam0,ksgn0):
         zw.stkLib[xcod]=d20;
         if qx.debugMod>0:
             print(d20.tail())
-            fss='tmp\\'+qx.prjName+'_'+xcod+'.csv'
+            #fss='tmp\\'+qx.prjName+'_'+xcod+'.csv'
+            fss=os.path.join('tmp',qx.prjName+'_'+xcod+'.csv')
             d20.to_csv(fss)
     
        
@@ -347,7 +351,8 @@ def BBANDS_dataPre(qx,xnam0,ksgn0):
         zw.stkLib[xcod]=d20;
         if qx.debugMod>0:
             print(d20.tail())
-            fss='tmp\\'+qx.prjName+'_'+xcod+'.csv'
+            #fss='tmp\\'+qx.prjName+'_'+xcod+'.csv'
+            fss=os.path.join('tmp',qx.prjName+'_'+xcod+'.csv')
             d20.to_csv(fss)
     
 def BBANDS_sta(qx):
@@ -494,7 +499,8 @@ def tur10_dataPre(qx,xnam0,ksgn0):
         if qx.debugMod>0:
             print(d20.tail())    
             #---
-            fss='tmp\\'+qx.prjName+'_'+xcod+'.csv'
+            #fss='tmp\\'+qx.prjName+'_'+xcod+'.csv'
+            fss=os.path.join('tmp',qx.prjName+'_'+xcod+'.csv')
             d20.to_csv(fss)   
                   
 #---------------MACD策略
@@ -603,7 +609,8 @@ def macd10_dataPre(qx,xnam0,ksgn0):
         if qx.debugMod>0:
             print(d20.tail())    
             #---
-            fss='tmp\\'+qx.prjName+'_'+xcod+'.csv'
+            #fss='tmp\\'+qx.prjName+'_'+xcod+'.csv'
+            fss=os.path.join('tmp',qx.prjName+'_'+xcod+'.csv')
             d20.to_csv(fss)   
             
 #------------kdj策略
@@ -716,7 +723,8 @@ def kdj10_dataPre(qx,xnam0,ksgn0):
         if qx.debugMod>0:
             print(d20.tail())    
             #---
-            fss='tmp\\'+qx.prjName+'_'+xcod+'.csv'
+            #fss='tmp\\'+qx.prjName+'_'+xcod+'.csv'
+            fss=os.path.join('tmp',qx.prjName+'_'+xcod+'.csv')
             d20.to_csv(fss)  
                         
 #----------RSI策略
@@ -788,6 +796,7 @@ def rsi10_dataPre(qx,xnam0,ksgn0):
         if qx.debugMod>0:
             print(d20.tail())    
             #---
-            fss='tmp\\'+qx.prjName+'_'+xcod+'.csv'
+            #fss='tmp\\'+qx.prjName+'_'+xcod+'.csv'
+            fss=os.path.join('tmp',qx.prjName+'_'+xcod+'.csv')
             d20.to_csv(fss)   
                         
