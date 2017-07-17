@@ -34,15 +34,25 @@ zwDat/
 '''
 #下载基础文件
 #
+
+def gotoPath(absPath):
+  os.chdir(absPath)
+  print('[+]CurrentPath:'+ os.getcwd())
+  
+gotoPath('e:\\Users\\yjh19\\workspace\\TomQuant\\TomProject')
 def downBase():        
     '''
     下载时基本参数数据时，有时会出现错误提升：
           timeout: timed out
           属于正常现象，是因为网络问题，等几分钟，再次运行几次 
-          '''
+    '''
+    os.getcwd()
     #rss=os.path.join(os.pardir,'zwDat','base')
     rss=zw._rdat0
+    rss=os.path.join(rss,'base')
     print(rss)
+    if os.path.exists(rss)==False:
+      os.makedirs(rss) 
     stk_inx0 = 'stk_inx0.csv'
     stk_base = 'stk_base.csv'
     stk_code = 'stk_code.csv'
@@ -124,7 +134,7 @@ def downInxFromFile(filePath, cycle):
 
 downBase()
 
-downStkFromFile()
+#downStkFromFile()
 
 
  

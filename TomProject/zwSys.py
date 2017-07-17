@@ -55,7 +55,7 @@ _rdatMin=_rdat0+"min/"
 _rdatTick=_rdat0+"tick/"
 _rdatTickReal=_rdat0+"tickreal/"
 '''
-_rdat0=os.path.join(os.pardir,'zwDat')
+_rdat0=os.path.join(os.pardir,'TomQuantData')
 _rdatCN=os.path.join(_rdat0,'cn'+os.sep)
 _rdatUS=os.path.join(_rdat0,'us'+os.sep)
 _rdatInx=os.path.join(_rdat0,'inx'+os.sep)
