@@ -488,7 +488,11 @@ def down_stk_cn020inx(qx,xtim0):
            
     return xd      
     
-def down_stk_cn010(qx):
+
+
+#modify by Tom
+def down_stk_cn010(qx, startTime):
+#def down_stk_cn010(qx):    
     ''' 中国A股数据下载子程序
     【输入】
         qx (zwDatX): 
@@ -503,7 +507,8 @@ def down_stk_cn010(qx):
         os.makedirs(rss);
     
     #tim0='1994-01-01';#tim0='2012-01-01';
-    tim0='2016-01-01';
+    tim0=startTime
+    #tim0='2016-01-01';
     #
     #fss=rss+xcod+'.csv'
     fss=os.path.join(rss,xcod+'.csv')
@@ -543,8 +548,9 @@ def down_stk_cn010(qx):
     
            
     return xd  
-    
-def down_stk_all(qx,finx):
+#modify by Tom
+def down_stk_all(qx,finx,startTime):  
+#def down_stk_all(qx,finx):
     '''
     根据finx股票列表文件，下载所有，或追加日线数据
     自动去重，排序
@@ -557,8 +563,11 @@ def down_stk_all(qx,finx):
         print("\n",i,"/",xn9,"code,",code)
         #---
         qx.code=code;
-        down_stk_cn010(qx);
+        down_stk_cn010(qx,startTime);
             
+
+
+        
 def down_stk_inx(qx,finx):
     dinx = pd.read_csv(finx,encoding='gbk');print(finx); 
     
