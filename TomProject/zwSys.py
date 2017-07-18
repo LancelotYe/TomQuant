@@ -55,6 +55,8 @@ _rdatMin=_rdat0+"min/"
 _rdatTick=_rdat0+"tick/"
 _rdatTickReal=_rdat0+"tickreal/"
 '''
+
+  
 _rdat0=os.path.join(os.pardir,'TomQuantData')
 _rdatCN=os.path.join(_rdat0,'cn'+os.sep)
 _rdatUS=os.path.join(_rdat0,'us'+os.sep)
@@ -67,6 +69,9 @@ _rdatZW=os.path.join(_rdat0,'zw'+os.sep)
 
 _rTmp=os.path.join('zwPython','zwQuant','demo','tmp'+os.sep)
 print(_rTmp)
+
+
+
 
 #----init.stk.var 初始化数据设置
 _stkTradeTaxi=0.002
@@ -91,6 +96,30 @@ stkInxLib=None  #全局变量，大盘指数，内存股票数据库
 stkLib={}       #全局变量，相关股票的交易数据，内存股票数据库
 stkLibCode=[]   #全局变量，相关股票的交易代码，内存股票数据库
 stkCodeTbl=None  #全局变量，相关股票的交易代码，名称对照表
+
+
+
+
+def gotoProjectPath():
+    #tomMobileTank  
+    #os.chdir('e:\\Users\\yjh19\\workspace\\TomQuant\\TomProject\\')
+    #TomMacBookAir   
+    os.chdir('/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomProject/')
+    print('[+]ProjectPath : '+ os.getcwd())
+    return os.getcwd()
+  
+def getBasePath():
+    gotoProjectPath()
+    rss=_rdat0
+    rss=os.path.join(rss,'base')
+    if os.path.exists(rss)==False:
+      os.makedirs(rss)
+    rss = os.path.abspath(rss)
+    os.getcwd()
+    print('[+]BassDataPathCreate : '+ rss)
+    return rss 
+
+
 
 
 
