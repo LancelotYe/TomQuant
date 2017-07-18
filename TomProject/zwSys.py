@@ -56,8 +56,33 @@ _rdatTick=_rdat0+"tick/"
 _rdatTickReal=_rdat0+"tickreal/"
 '''
 
+def gotoProjectPath():
+    #tomMobileTank  
+    #os.chdir('e:\\Users\\yjh19\\workspace\\TomQuant\\TomProject\\')
+    #TomMacBookAir   
+    os.chdir('/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomProject/')
+    print('[+]ProjectPath : '+ os.getcwd())
+    return os.getcwd()
   
-_rdat0=os.path.join(os.pardir,'TomQuantData')
+def getBasePath():
+    gotoProjectPath()
+    rss=_rdat0
+    rss=os.path.join(rss,'base')
+    if os.path.exists(rss)==False:
+      os.makedirs(rss)
+    rss = os.path.abspath(rss)
+    os.getcwd()
+    print('[+]BassDataPathCreate : '+ rss)
+    return rss 
+
+def getTomQuantData():
+    gotoProjectPath()
+    os.chdir(os.pardir)
+    os.chdir('TomQuantData')
+    return os.getcwd()
+    
+    
+_rdat0=getTomQuantData()
 _rdatCN=os.path.join(_rdat0,'cn'+os.sep)
 _rdatUS=os.path.join(_rdat0,'us'+os.sep)
 _rdatInx=os.path.join(_rdat0,'inx'+os.sep)
@@ -100,24 +125,7 @@ stkCodeTbl=None  #全局变量，相关股票的交易代码，名称对照表
 
 
 
-def gotoProjectPath():
-    #tomMobileTank  
-    #os.chdir('e:\\Users\\yjh19\\workspace\\TomQuant\\TomProject\\')
-    #TomMacBookAir   
-    os.chdir('/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomProject/')
-    print('[+]ProjectPath : '+ os.getcwd())
-    return os.getcwd()
-  
-def getBasePath():
-    gotoProjectPath()
-    rss=_rdat0
-    rss=os.path.join(rss,'base')
-    if os.path.exists(rss)==False:
-      os.makedirs(rss)
-    rss = os.path.abspath(rss)
-    os.getcwd()
-    print('[+]BassDataPathCreate : '+ rss)
-    return rss 
+
 
 
 

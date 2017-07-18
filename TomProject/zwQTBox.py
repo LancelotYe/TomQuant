@@ -227,7 +227,10 @@ def xtick2minWr(qx,rsk):
         xdf=xdf.sort_values(by=['time'],ascending=False)
         #fss=zw._rdatMin+sgnMin+'\\'+qx.code+'.csv';print(fss)
         #fss=rsk+sgnMin+'\\'+qx.code+'.csv';print(fss)
-        fss=os.path.join(rsk+sgnMin,qx.code+'.csv');print(fss)
+        fss=os.path.join(rsk,sgnMin)
+        if os.path.exists(fss)==False:
+            os.makedirs(fss)
+        fss=os.path.join(fss,qx.code+'.csv');print(fss)
         if len(xdf)>3:
             xdf.to_csv(fss,columns=zw.qxMinName,index=False,encoding='utf') 
         qx.datMin[sgnMin]=xdf            
@@ -415,6 +418,9 @@ def xtick_real_down_all(qx,finx):
     '''
     #qx.min_ksgns=['05','15','30','60']
     rdat=zw._rdatTickReal;
+    rdat=os.path.join(rdat,'tick')
+    if os.path.exists(rdat)==False:
+        os.makedirs(rdat)
     dinx = pd.read_csv(finx,encoding='gbk');print('finx',finx);
     i,xn9=0,len(dinx['code']);
     for xc in dinx['code']:
@@ -425,7 +431,8 @@ def xtick_real_down_all(qx,finx):
         df=xtick_real_downsub(code)
         if len(df)>10:
             #fss=rdat+'tick\\'+qx.code+'.csv';print('\n',fss)
-            fss=os.path.join(rdat,'tick',qx.code+'.csv');print('\n',fss)
+            
+            fss=os.path.join(rdat,qx.code+'.csv');print('\n',fss)
             df.to_csv(fss,index=False,encoding='utf') 
             qx.datTick=df
             #---------- tick 分笔数据，转换为分时数据：05,15,30,60
@@ -433,7 +440,8 @@ def xtick_real_down_all(qx,finx):
                 qx.min_knum,qx.min_ksgnWrk,ksgn=int(kss),'M'+kss,'M'+kss
                 #qx.rminWrk='%s\\%s\\'%(qx.rmin0k,qx.min_ksgnWrk);
                 qx.rminWrk=os.path.join(qx.rmin0k, qx.min_ksgnWrk)
-                if not os.path.exists(qx.rminWrk):os.mkdir(qx.rminWrk)
+                if os.path.exists(qx.rminWrk)==False:
+                    os.makedirs(qx.rminWrk)
                 #
                 #sgnMin='M'+ksgn0;qx.minType=int(ksgn0);       # print('@mt',qx.minType)
                 qx.datMin[ksgn]=pd.DataFrame(columns=zw.qxMinName);        

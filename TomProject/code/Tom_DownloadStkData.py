@@ -91,5 +91,7 @@ downBase()
 
 downStkFromFile(stk_code,'day', '2015-01-01')
 
-
- 
+#当天分时数据
+def downTodayStkData():
+    qx = zw.zwDatX(zw._rdatTickReal)
+    zwx.xtick_real_down_all(qx,stk_code)
