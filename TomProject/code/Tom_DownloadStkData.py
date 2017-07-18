@@ -96,4 +96,4 @@ def downTodayStkData():
     
 downBase()
 
-downStkFromFile(stk_code,'day', '2015-01-01')
+#downStkFromFile(stk_code,'day', '2015-01-01')

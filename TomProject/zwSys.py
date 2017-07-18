@@ -69,7 +69,7 @@ def getBasePath():
     rss=_rdat0
     rss=os.path.join(rss,'base')
     if os.path.exists(rss)==False:
-      os.makedirs(rss)
+        os.makedirs(rss)
     rss = os.path.abspath(rss)
     os.getcwd()
     print('[+]BassDataPathCreate : '+ rss)
@@ -78,8 +78,11 @@ def getBasePath():
 def getTomQuantData():
     gotoProjectPath()
     os.chdir(os.pardir)
-    os.chdir('TomQuantData')
-    return os.getcwd()
+    rss=os.getcwd()
+    rss=os.path.join(rss,'TomQuantData')
+    if os.path.exists(rss)==False:
+        os.makedirs(rss)
+    return rss
     
     
 _rdat0=getTomQuantData()
