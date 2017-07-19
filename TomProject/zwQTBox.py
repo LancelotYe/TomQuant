@@ -121,7 +121,8 @@ def xtick_down8tim_codes(qx):
         code="%06d" %xc;#print("\n",i,"/",qx.codeNum,"code,",code)
         qx.code,qx.codeCnt=code,i
         #--- 
-        ftg='%s%s_%s.csv'%(qx.rtickTimMon,code,qx.xtimSgn);
+        ftg=os.path.join(qx.rtickTimMon,code+'_'+qx.xtimSgn+'.csv')
+        #ftg='%s%s_%s.csv'%(qx.rtickTimMon,code,qx.xtimSgn);
         xfg=os.path.exists(ftg);  
         if xfg:
             numNil=0
@@ -136,6 +137,24 @@ def xtick_down8tim_codes(qx):
         if numNil>90:break
         #if i>3:break
     
+    
+    
+    
+'''
+testfinx='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/Base/stk_test.csv'
+qx = zw.zwDatX(zw._rdatMin)
+qx.xday0k='2016-05-01'
+qx.xday9k='2016-05-20'
+#qx.xdayNum=2
+xtick_down8tim_all(qx, testfinx)
+
+
+
+
+
+
+
+'''
 def xtick_down8tim_all(qx,finx):
     '''
     下载所有股票代码的所有tick历史分笔数据，按时间日期循环下载
@@ -154,10 +173,11 @@ def xtick_down8tim_all(qx,finx):
         qx.xdayInx,qx.xtimSgn=tc,qx.DTxtim.strftime('%Y-%m-%d'); 
         #
         rmon0=qx.DTxtim.strftime('%Y-%m'); 
-        qx.rtickTimMon='%s%s' %(qx.rtickTim,rmon0)
+        #qx.rtickTimMon='%s%s' %(qx.rtickTim,rmon0)
+        qx.rtickTimMon=os.path.join(qx.rtickTim,rmon0)
         xfg=os.path.exists(qx.rtickTimMon);
         if not xfg:
-            os.mkdir(qx.rtickTimMon)
+            os.makedirs(qx.rtickTimMon)
         #
         print('\n',xfg,qx.xdayInx,'/',qx.xdayNum,qx.xtimSgn)
         #
@@ -189,7 +209,7 @@ def xtick2tim_code010(qx):
         if qx.xtickAppFlag:
             
             #fss=zw._rdatTick+qx.code+'\\'+qx.xtim+'.csv'
-            fss=os.path.join(zw._rdatTick+qx.code,qx.tim+'.csv')
+            fss=os.path.join(zw._rdatTick,qx.code,qx.tim+'.csv')
             
             xfg=os.path.exists(fss);
             if xfg:qx.datMin[ksgn]=pd.read_csv(fss,index_col=False)
@@ -399,6 +419,8 @@ def xtick_real_downsub(xcod):
     #
     return xd
     
+
+
 def xtick_real_down_all(qx,finx):
     '''
     下载当天的实时tick分笔数据，并自动转换为分时数据
@@ -447,7 +469,7 @@ def xtick_real_down_all(qx,finx):
                 qx.datMin[ksgn]=pd.DataFrame(columns=zw.qxMinName);        
                 xtick2min010(qx)   
             #
-            xtick2minWr(qx,rdat)
+            xtick2minWr(qx,rdat) 
 
 #----------------down.stk
 

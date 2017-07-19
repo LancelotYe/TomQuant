@@ -35,7 +35,7 @@ stk_zz500 = os.path.join(rss, 'stk_zz500.csv')
 
 
 
-def downBase():        
+def downBase():
     '''
     下载时基本参数数据时，有时会出现错误提升：
           timeout: timed out
@@ -90,10 +90,22 @@ def downInxFromFile(filePath, cycle):
 
 
 #当天分时数据
-def downTodayStkData():
+def downTodayTick(StkSourcePath):
     qx = zw.zwDatX(zw._rdatTickReal)
-    zwx.xtick_real_down_all(qx,stk_code)
+    zwx.xtick_real_down_all(qx,StkSourcePath)
+    
+    
+def downPastTick(StkSourcePath,startDate,endDate):
+    testfinx='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/Base/stk_test.csv'
+    qx = zw.zwDatX(zw._rdatMin)
+    qx.xday0k='2016-05-01'
+    qx.xday9k='2016-05-20'
+    #qx.xdayNum=2
+    zwx.xtick_down8tim_all(qx, testfinx)
     
 downBase()
 
-#downStkFromFile(stk_code,'day', '2015-01-01')
+downStkFromFile(stk_code,'day', '2015-01-01')
+
+downTodayTick(stk_code)
+
