@@ -121,9 +121,12 @@ def xtick_down8tim_codes(qx):
         code="%06d" %xc;#print("\n",i,"/",qx.codeNum,"code,",code)
         qx.code,qx.codeCnt=code,i
         #--- 
-        ftg=os.path.join(qx.rtickTimMon,code+'_'+qx.xtimSgn+'.csv')
+        #ftg=os.path.join(qx.rtickTimMon,code+'_'+qx.xtimSgn+'.csv')
+        ftg=os.path.join(qx.rtickTimMon,qx.xtimSgn)
         #ftg='%s%s_%s.csv'%(qx.rtickTimMon,code,qx.xtimSgn);
-        xfg=os.path.exists(ftg);  
+        if os.path.exists(ftg)==False:os.makedirs(ftg)
+        ftg=os.path.join(ftg,code+'.csv')
+        xfg=os.path.exists(ftg) ;
         if xfg:
             numNil=0
         else:
@@ -141,6 +144,7 @@ def xtick_down8tim_codes(qx):
     
     
 '''
+TomTest
 testfinx='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/Base/stk_test.csv'
 qx = zw.zwDatX(zw._rdatMin)
 qx.xday0k='2016-05-01'
@@ -183,7 +187,7 @@ def xtick_down8tim_all(qx,finx):
         #
         xtick_down8tim_codes(qx)
               
- 
+       
 #----xtimck2tim.xxx 分笔tick数据，转换为分时数据
 
     
@@ -203,13 +207,13 @@ def xtick2tim_code010(qx):
     #xtick_setTimeDat(qx)
     
     for kss in qx.min_ksgns: 
-        rx.min_knum,rx.min_ksgnWrk=int(kss),'M'+kss
+        qx.min_knum,qx.min_ksgnWrk,ksgn=int(kss),'M'+kss,int(kss)
         qx.datMin[kss]=pd.DataFrame(columns=zw.qxMinName);        
         #默认=False，tick数据追加模式标志,如果=True,强行将所有tick文件转换为分时数据
         if qx.xtickAppFlag:
             
             #fss=zw._rdatTick+qx.code+'\\'+qx.xtim+'.csv'
-            fss=os.path.join(zw._rdatTick,qx.code,qx.tim+'.csv')
+            fss=os.path.join(zw._rdatTick,qx.code,qx.xtim+'.csv')
             
             xfg=os.path.exists(fss);
             if xfg:qx.datMin[ksgn]=pd.read_csv(fss,index_col=False)
@@ -229,7 +233,21 @@ def xtick2tim_code010(qx):
     xtick2minWr(qx,zw._rdatTick)
     
 #---------
+'''
+TomTest
+finx = '/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/min/tick/2016-05/2016-05-03/000001.csv'
+df=pd.read_csv(finx, encoding='gbk')
 
+qx.datTick=df
+testfinx= '/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/min/tick/2016-05/2016-05-03/'
+qx = zw.zwDatX()
+#qx.min_ksgns=['05']
+
+
+
+xtick2tim_code100(qx)
+
+'''
 def xtick2minWr(qx,rsk):
     '''
     把所有分时数据，保存到文件
@@ -304,13 +322,18 @@ def xtick2min010(qx):
         df=qx.datTick;#print(df.head())
         df2=df[df['time']<strTim9]
         df3=df2[df2['time']>=strTim0]
+        
         if len(df3)>0:
             #-----tick 数据 转换为分时数据：5/15/30/60 分钟
             ds=xtick2minsub(df3)
             ds['time']=qx.xtimSgn+' '+strTim0
             qx.datMin[qx.min_ksgnWrk]=qx.datMin[qx.min_ksgnWrk].append(ds.T,ignore_index=True)
+            
+            #fss=os.path.join(qx.rminWrk,qx.code+'.csv')
+            #df3.to_csv(fss,columns=zw.qxMinName,index=False,encoding='utf') 
         #----ok,#tc
         wrkDTim0=wrkDTim9
+        
     
 def xtick2tim100(qx,fdat):
     '''
@@ -343,9 +366,19 @@ def xtick2tim_nday(qx):
         xtick2tim100(qx,fdat)
         
         
-                 
+    
+'''
+TomTest
+qx=zw.zwDatX()
+qx.code='000001'
+xtick2tim_code100(qx)
+
+'''
+
+             
 def xtick2tim_code100(qx):
     '''
+    cycle=['01', '30', '60']
     根据qx.min_ksgns预设的分时参数，
     以及指定的股票代码、时间周期参数，
     将对应的tick数据，转换为分时数据，并保存到文件
@@ -356,14 +389,17 @@ def xtick2tim_code100(qx):
        分时数据保存在目录：
            \zwdat\min\Mxx\
     '''
+    
+        
     for kss in qx.min_ksgns: 
         qx.min_knum,qx.min_ksgnWrk,ksgn=int(kss),'M'+kss,'M'+kss
         #qx.rminWrk='%s\\%s\\'%(qx.rmin0k,qx.min_ksgnWrk);
         qx.rminWrk=os.path.join(qx.rmin0k,qx.min_ksgnWrk)
-        if not os.path.exists(qx.rminWrk):os.mkdir(qx.rminWrk)
+        if not os.path.exists(qx.rminWrk):os.makedirs(qx.rminWrk)
         #
         qx.datMin[ksgn]=pd.DataFrame(columns=zw.qxMinName);        
-        fss='%s%s.csv'%(qx.rminWrk,qx.code);    #print('@fss',fss,len(qx.datMin[ksgn]))
+        #fss='%s%s.csv'%(qx.rminWrk,qx.code);
+        fss=os.path.join(qx.rminWrk,qx.code)
         xfg=os.path.exists(fss); #print(xfg,'@f100',fss,len(qx.datMin[ksgn]))
         if xfg:
             qx.datMin[ksgn]=pd.read_csv(fss,index_col=False)
@@ -372,6 +408,9 @@ def xtick2tim_code100(qx):
     xtick2tim_nday(qx)   
     xtick2minWr(qx,qx.rmin0k)
     
+
+
+
 
 def xtick2tim_allcode(qx):
     '''
@@ -392,6 +431,19 @@ def xtick2tim_allcode(qx):
         xtick2tim_code100(qx)
                 
 
+#TomTest
+'''
+testfinx='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/Base/stk_code.csv'
+    #qx = zw.zwDatX(zw._rdatMin)
+    #qx.xday0k='2016-05-01'
+    #qx.xday9k='2016-05-20'
+    #qx.xdayNum=2
+    
+qx = zw.zwDatX(zw._rdatMin)
+df = pd.read_csv(testfinx, encoding='gbk')
+qx.stkCodeLib = df
+xtick2tim_allcode(qx)
+'''
         
 #---------------xtick.real.xxx
 
@@ -421,7 +473,7 @@ def xtick_real_downsub(xcod):
     
 
 
-def xtick_real_down_all(qx,finx):
+def xtick_real_down_all(qx,finx,cycles):
     '''
     下载当天的实时tick分笔数据，并自动转换为分时数据
     输入：
@@ -438,6 +490,9 @@ def xtick_real_down_all(qx,finx):
         
         
     '''
+    #modify by tom
+    if cycles:
+        qx.min_ksgns=cycles
     #qx.min_ksgns=['05','15','30','60']
     rdat=zw._rdatTickReal;
     rdat=os.path.join(rdat,'tick')
@@ -467,9 +522,11 @@ def xtick_real_down_all(qx,finx):
                 #
                 #sgnMin='M'+ksgn0;qx.minType=int(ksgn0);       # print('@mt',qx.minType)
                 qx.datMin[ksgn]=pd.DataFrame(columns=zw.qxMinName);        
-                xtick2min010(qx)   
+                xtick2min010(qx)  
+                
             #
             xtick2minWr(qx,rdat) 
+            #xtick2minWr(qx,qx.rminWrk) 
 
 #----------------down.stk
 

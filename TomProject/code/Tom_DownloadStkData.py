@@ -51,7 +51,8 @@ def downBase():
     d20=dat.loc[:,c20]
     d20['code']=d20.index;
     
-    d20=d20.sort(columns='code')
+    #d20=d20.sort(columns='code')
+    d20=d20.sort_values(by='code')
     d20.to_csv(stk_code,index=False,encoding='gbk',date_format='str');
     
     #sz50,上证50；hs300,沪深300；zz500，中证500
@@ -88,24 +89,31 @@ def downInxFromFile(filePath, cycle):
     
 
 
-
-#当天分时数据
-def downTodayTick(StkSourcePath):
+'''
+当天分时数据
+'''
+def downTodayTickAndCycle(StkSourcePath, cycles):
     qx = zw.zwDatX(zw._rdatTickReal)
-    zwx.xtick_real_down_all(qx,StkSourcePath)
+    #qx.ksgns=cycles
+    zwx.xtick_real_down_all(qx,StkSourcePath,cycles)
     
     
+'''
+历史分时数据
+'''
 def downPastTick(StkSourcePath,startDate,endDate):
-    testfinx='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/Base/stk_test.csv'
+    #testfinx='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/Base/stk_test.csv'
+    testfinx='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/Base/stk_code.csv'
     qx = zw.zwDatX(zw._rdatMin)
     qx.xday0k='2016-05-01'
     qx.xday9k='2016-05-20'
     #qx.xdayNum=2
     zwx.xtick_down8tim_all(qx, testfinx)
     
-downBase()
+#downBase()
 
-downStkFromFile(stk_code,'day', '2015-01-01')
+#downStkFromFile(stk_code,'day', '2015-01-01')
 
-downTodayTick(stk_code)
+#downTodayTickAndCycle(stk_code, ['01', '20'])
 
+downPastTick(stk_code,'x','x')
