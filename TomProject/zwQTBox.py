@@ -328,13 +328,23 @@ def xtick2min010(qx):
             ds=xtick2minsub(df3)
             ds['time']=qx.xtimSgn+' '+strTim0
             qx.datMin[qx.min_ksgnWrk]=qx.datMin[qx.min_ksgnWrk].append(ds.T,ignore_index=True)
-            
             #fss=os.path.join(qx.rminWrk,qx.code+'.csv')
             #df3.to_csv(fss,columns=zw.qxMinName,index=False,encoding='utf') 
         #----ok,#tc
         wrkDTim0=wrkDTim9
         
-    
+        
+        
+'''
+TomTest
+fdat='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/tick/2016-05/2016-05-03/000001.csv'
+rsk='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/tick/2016-05/2016-05-03/'
+qx=zw.zwDatX()
+qx.code='000001'
+qx.min_ksgns=['10','20']
+xtick2tim100(qx,fdat)
+xtick2minWr(qx, rsk)
+'''
 def xtick2tim100(qx,fdat):
     '''
     根据输入的fdat文件名，读取tick分笔数据，并转换为对应的分时数据：5/15/30/60 分钟
@@ -348,6 +358,7 @@ def xtick2tim100(qx,fdat):
         if len(qx.datTick)>10:
             for kss in qx.min_ksgns: #qx.min_ksgns=['M05','M15','M30','M60']
                 qx.min_knum,qx.min_ksgnWrk,ksgn=int(kss),'M'+kss,'M'+kss
+                qx.datMin[qx.min_ksgnWrk]=pd.DataFrame(columns=zw.qxMinName)
                 xtick2min010(qx)   
                 
 def xtick2tim_nday(qx):

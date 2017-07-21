@@ -11,6 +11,7 @@ import zwSys as zw
 import zwQTBox as zwx
 import zwTools as zwt
 
+import tushare as ts
 #import Tom_Prefix as tp
 
 
@@ -105,15 +106,31 @@ def downPastTick(StkSourcePath,startDate,endDate):
     #testfinx='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/Base/stk_test.csv'
     testfinx='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/Base/stk_code.csv'
     qx = zw.zwDatX(zw._rdatMin)
-    qx.xday0k='2016-05-01'
-    qx.xday9k='2016-05-20'
+    qx.xday0k='2016-01-01'
+    qx.xday9k='2017-07-20'
     #qx.xdayNum=2
     zwx.xtick_down8tim_all(qx, testfinx)
+    
+#这个方法可以将任意tick数据转化成定制的
+def turnToMinuteTick(tickSourceFile, outputMinDir, cycles):
+    fdat='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/tick/2016-05/2016-05-03/000001.csv'
+    rsk='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/tick/2016-05/2016-05-03/'
+    qx=zw.zwDatX()
+    qx.code='000001'
+    qx.min_ksgns=['01']
+    zwx.xtick2tim100(qx,fdat)
+    zwx.xtick2minWr(qx, rsk)
     
 #downBase()
 
 #downStkFromFile(stk_code,'day', '2015-01-01')
 
-#downTodayTickAndCycle(stk_code, ['01', '20'])
+downTodayTickAndCycle(stk_code, ['01', '20'])
 
-downPastTick(stk_code,'x','x')
+#downPastTick(stk_code,'x','x')
+
+def chooseStkCodeList(codeList):
+    df = pd.read_csv(stk_code, encoding='gbk')
+    for code in codeList:
+        if code == df['code']:
+            df0.append( df[df['code']==code])
