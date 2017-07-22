@@ -97,6 +97,8 @@ def xtick_down100(qx,ftg):
         df['type']=df['type'].str.replace(u'中性盘', 'norm');
         df['type']=df['type'].str.replace(u'买盘', 'buy');
         df['type']=df['type'].str.replace(u'卖盘', 'sell');
+        if os.path.exists(ftg):
+            os.makedirs(ftg)
         df.to_csv(ftg,index=False,encoding='utf') 
         datFlag=True
     #
@@ -122,11 +124,12 @@ def xtick_down8tim_codes(qx):
         qx.code,qx.codeCnt=code,i
         #--- 
         #ftg=os.path.join(qx.rtickTimMon,code+'_'+qx.xtimSgn+'.csv')
-        ftg=os.path.join(qx.rtickTimMon,qx.xtimSgn)
+        #ftg=os.path.join(qx.rtickTimMon,qx.xtimSgn)
         #ftg='%s%s_%s.csv'%(qx.rtickTimMon,code,qx.xtimSgn);
-        if os.path.exists(ftg)==False:os.makedirs(ftg)
-        ftg=os.path.join(ftg,code+'.csv')
-        xfg=os.path.exists(ftg) ;
+        #if os.path.exists(ftg)==False:os.makedirs(ftg)
+        #ftg=os.path.join(ftg,code+'.csv')
+        ftg=os.path.join(qx.rtickTimMon,qx.xtimSgn+'_'+code+'.csv')
+        xfg=os.path.exists(ftg)
         if xfg:
             numNil=0
         else:
