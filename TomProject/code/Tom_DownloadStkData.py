@@ -32,6 +32,17 @@ select_stk_code = os.path.join(base,'select_stk_code.csv')
 
 TomQuantData = zw.getTomQuantDataPath()
 his_tick_sourceDir = os.path.join(TomQuantData, 'min', 'tick')
+
+
+tickSourceDir=os.path.join(zw._rdatMin,'tick')
+outputMinDir=os.path.join(zw._rdatMin)
+#sourcePath
+dayDataPath=os.path.join(zw._rdatCN,'day')
+hisTickPath=os.path.join(zw._rdatMin,'tick')
+hisTickToMinPath=os.path.join(zw._rdatMin)
+realTickPath=os.path.join(zw._rdatTickReal,'tick')
+realTickToMinPath=os.path.join(realTickPath)
+#
 '''
 基础文件数据
 '''
@@ -198,11 +209,9 @@ def transToMinWithTickSourceDir(selectCodefile,tickSourceDir,outputMinDir,startd
                                     transfToMinWithTick(f,outD,cycles)
         startdate+=delta
                     
-tickSourceDir=os.path.join(zw._rdatMin,'tick')
-#date = '2015-01-06'
-outputMinDir=os.path.join(zw._rdatMin)
+
 print(outputMinDir)
-transToMinWithTickSourceDir(select_stk_code,tickSourceDir,outputMinDir,'2015-01-06','2015-01-12',['01','30'])
+#transToMinWithTickSourceDir(select_stk_code,tickSourceDir,outputMinDir,'2015-01-06','2015-01-12',['01','30'])
 
 #xstr = 'xxxx_123123'
 #xstr =xstr.split('_')[1]
