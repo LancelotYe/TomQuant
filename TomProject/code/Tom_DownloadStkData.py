@@ -5,13 +5,14 @@ import os,sys
 import numpy as np
 import pandas as pd
 import tushare as ts
-
+import tushare as ts
+import datetime as dt
 #  zwQuant
 import zwSys as zw  
 import zwQTBox as zwx
 import zwTools as zwt
 
-import tushare as ts
+
 #import Tom_Prefix as tp
 
 #下载基础文件
@@ -96,7 +97,7 @@ def getInxFromFile(filePath):
 #getInxFromFile(stk_inx0)
 
 '''
-个股数据
+个股数据指定日期至今的日结数据
 '''
 #日数据
 #传入周期，和文件路径
@@ -111,6 +112,8 @@ def getStkFromFile(StkSourcePath,startTime):
     
     
 #getStkFromFile(stk_code,'2017-05-01')
+#getStkFromFile(select_stk_code, '2017-05-01')
+
 #当天分时数据
 def getTodayTickAndCycle(StkSourcePath, cycles):
     qx = zw.zwDatX(zw._rdatTickReal)
@@ -118,6 +121,7 @@ def getTodayTickAndCycle(StkSourcePath, cycles):
     zwx.xtick_real_down_all(qx,StkSourcePath,cycles)
     
 #getTodayTickAndCycle(stk_code, ['01','05','30'])
+#getTodayTickAndCycle(select_stk_code,['01','05','30'])
 '''
 历史分时数据
 '''
@@ -135,6 +139,7 @@ def getPastTick(StkSourcePath,startDate,endDate):
     zwx.xtick_down8tim_all(qx, StkSourcePath)
     
 #getPastTick(stk_code,'2015-01-03','2015-03-04')
+#getPastTick(select_stk_code,'2015-01-03','2016-03-04')
 #这个方法可以将任意tick数据转化成定制的
 def transfToMinWithTick(tickSourceFile, outputMinDir, cycles):
     #fdat='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/tick/2016-05/2016-05-03/000001.csv'
@@ -152,11 +157,37 @@ def transfToMinWithTick(tickSourceFile, outputMinDir, cycles):
         qx.min_ksgns=cycles
         zwx.xtick2tim100(qx,fdat)
         zwx.xtick2minWr(qx, rsk)
-    
-def transfToMinWithTickList(tickSourceFileList, outputMinDir, cycles):
-    for file in tickSourceFileList:
-        transfToMinWithTick(file, outputMinDir, cycles)
-        
+
+
+
+
+'''
+tickSourceDir指定需要转换的历史tick数据父路径../TomQuantData/min/tick
+outputMinDir转换完成以后传出到该文件目录，无需添加日期标记文件夹
+date传入需要转换的日期data='yyyy-mm-dd'
+cycle指定修改的周期列表
+'''
+def transToMinWithTick(tickSourceDir, outputMinDir, date, cycles):
+    #date='2015-01-01'
+    os.chdir(tickSourceDir)
+    os.listdir()
+    dDate=dt.datetime.strptime(date, '%Y-%m-%d')
+    getYM=dDate.strftime('%Y-%m')
+    for d in os.listdir():
+        if d == getYM:
+            mouthDir=os.path.join(tickSourceDir,getYM)
+            for f in os.listdir(mouthDir):
+                if f.startswith(date):
+                    print(f)
+                    outD=os.path.join(outputMinDir,date)
+                    if not os.path.exists(outD):
+                        os.makedirs(outD)
+                    transfToMinWithTick(f,outD,cycles)
+                    
+tickSourceDir=os.path.join(zw._rdatMin,'tick')
+outputMinDir=os.path.join(zw._rdatMin)
+print(outputMinDir)
+transToMinWithTick(tickSourceDir,outputMinDir,'2015-01-06',['01','30'])
 
 
 
