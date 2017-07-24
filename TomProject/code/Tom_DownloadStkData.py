@@ -73,7 +73,7 @@ def downBase():
 '''
 选取自定义股票
 '''
-codeList = [600129, 600192, 600231]
+codeList = [600129, 600192, 600231,600192]
 
 def selectStkCodeList(codeList):
     if os.path.exists(select_stk_code):
@@ -143,20 +143,24 @@ def getPastTick(StkSourcePath,startDate,endDate):
 #这个方法可以将任意tick数据转化成定制的
 def transfToMinWithTick(tickSourceFile, outputMinDir, cycles):
     #fdat='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/tick/2016-05/2016-05-03/000001.csv'
-    fdat = tickSourceFile
+    
+    #fdat = tickSourceFile
+    tickSourceFile = '/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/min/tick/2015-01/2015-01-06_600192.csv'
     #rsk='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/tick/2016-05/2016-05-03/'
     #qx.code='000001'
     #qx.min_ksgns=['01']
     rsk=outputMinDir
     qx=zw.zwDatX()
+    
+    qx.code=tickSourceFile.split(os.path.sep)[-1].split('_')[1].split('.')[0]
     #df=pd.read_csv(select_stk_code,encoding='gbk')
-    df=pd.read_csv(tickSourceFile,encoding='gbk')
-    codeList=df['code']
-    for code in codeList:
-        qx.code=code
-        qx.min_ksgns=cycles
-        zwx.xtick2tim100(qx,fdat)
-        zwx.xtick2minWr(qx, rsk)
+    #df=pd.read_csv(tickSourceFile,encoding='gbk')
+    #codeList=df['code']
+    #for code in codeList:
+        #qx.code=code
+    qx.min_ksgns=cycles
+    zwx.xtick2tim100(qx,tickSourceFile)
+    zwx.xtick2minWr(qx, rsk)
 
 
 
@@ -167,27 +171,39 @@ outputMinDir转换完成以后传出到该文件目录，无需添加日期标�
 date传入需要转换的日期data='yyyy-mm-dd'
 cycle指定修改的周期列表
 '''
-def transToMinWithTick(tickSourceDir, outputMinDir, date, cycles):
+def transToMinWithTickSourceDir(selectCodefile,tickSourceDir,outputMinDir,startdate,enddate,cycles):
     #date='2015-01-01'
+    selectCodes=pd.read_csv(selectCodefile,encoding='gbk')['code']
     os.chdir(tickSourceDir)
     os.listdir()
-    dDate=dt.datetime.strptime(date, '%Y-%m-%d')
-    getYM=dDate.strftime('%Y-%m')
-    for d in os.listdir():
-        if d == getYM:
-            mouthDir=os.path.join(tickSourceDir,getYM)
-            for f in os.listdir(mouthDir):
-                if f.startswith(date):
-                    print(f)
-                    outD=os.path.join(outputMinDir,date)
-                    if not os.path.exists(outD):
-                        os.makedirs(outD)
-                    transfToMinWithTick(f,outD,cycles)
+    startdate=dt.datetime.strptime(startdate, '%Y-%m-%d')
+    startdate=dt.datetime.strptime('2015-01-06', '%Y-%m-%d')
+    enddate=dt.datetime.strptime(enddate, '%Y-%m-%d')
+    delta=dt.timedelta(days=1)
+    while(startdate<=enddate):
+        getYM=startdate.strftime('%Y-%m')
+        for d in os.listdir():
+            if d == getYM:
+                mouthDir=os.path.join(tickSourceDir,getYM)
+                datestr=startdate.strftime('%Y-%m-%d')
+                for f in os.listdir(mouthDir):
+                    if f.startswith(datestr):
+                        for code in selectCodes:
+                            if f.split('_')[1].split('.')[0]==str(code):
+                                f=os.path.join(mouthDir, f)
+                                print(f)
+                                outD=os.path.join(outputMinDir,datestr)
+                                if not os.path.exists(outD):
+                                    os.makedirs(outD)
+                                    transfToMinWithTick(f,outD,cycles)
+        startdate+=delta
                     
 tickSourceDir=os.path.join(zw._rdatMin,'tick')
+#date = '2015-01-06'
 outputMinDir=os.path.join(zw._rdatMin)
 print(outputMinDir)
-transToMinWithTick(tickSourceDir,outputMinDir,'2015-01-06',['01','30'])
+transToMinWithTickSourceDir(select_stk_code,tickSourceDir,outputMinDir,'2015-01-06','2015-01-12',['01','30'])
 
-
+#xstr = 'xxxx_123123'
+#xstr =xstr.split('_')[1]
 
