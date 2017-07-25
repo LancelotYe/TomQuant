@@ -10,8 +10,8 @@ import numpy as np
 
 code='000009'
 cycle='01'
-date='2017-06-12'
-datastyle='hisTickToMin'
+date='2017-06-14'
+datastyle='hisTick'
 rP,df,fromDate,toDate,selectDF,codename=ta.readStk(datastyle,date,cycle,code)
 print(df)
 print(rP)
@@ -20,4 +20,4 @@ print(toDate)
 print(selectDF)
 #print(codename)
 #tomdraw(code,readPath,datastyle, fromDate, toDate, plotList)
-tda.tomdraw(code,rP,datastyle,fromDate,toDate,['K','V'])
+tda.tomdraw(code,rP,datastyle,fromDate,toDate,['P'])
