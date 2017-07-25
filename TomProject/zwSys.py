@@ -63,7 +63,7 @@ def gotoProjectPath():
     os.chdir('/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomProject/')
     #TomMacPro
     #os.chdir('/Users/yejunhai/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomProject/')    
-    print('[+]ProjectPath : '+ os.getcwd())
+    #print('[+]ProjectPath : '+ os.getcwd())
     return os.getcwd()
 
 def getTomQuantDataPath():
@@ -91,11 +91,11 @@ _rdatInx=os.path.join(_rdat0,'inx'+os.sep)
 _rdatMin=os.path.join(_rdat0,'min'+os.sep)
 _rdatTick=os.path.join(_rdat0,'tick'+os.sep)
 _rdatTickReal=os.path.join(_rdat0, 'tickreal'+os.sep)
-print(_rdatCN)
+#print(_rdatCN)
 _rdatZW=os.path.join(_rdat0,'zw'+os.sep)
 
 _rTmp=os.path.join('zwPython','zwQuant','demo','tmp'+os.sep)
-print(_rTmp)
+#print(_rTmp)
 
 
 

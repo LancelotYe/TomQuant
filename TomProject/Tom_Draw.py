@@ -120,9 +120,6 @@ def tomdraw(code,readPath,datastyle, fromDate, toDate, plotList):
     #if datastyle=='dayData':
     fname=readPath
     qs,w = getDataFromCSVWithDataStyle(datastyle,fname,fromDate,toDate)
-    
-    
-    
     try:
         left,width = 0, 3.5
         rect_vol = [left, 0, width, 0.8]
@@ -134,42 +131,6 @@ def tomdraw(code,readPath,datastyle, fromDate, toDate, plotList):
                 drawVolumns(rect_vol, qs, True)
     except Exception as e:
         print(e);
-    
-    
-    '''
-    elif datastyle=='hisTick':
-        return
-    elif datastyle=='hisTickToMin':
-        fname=readPath
-        qs = getDataFromCSV(fname,fromDate,toDate)
-        try:
-            left,width = 0, 3.5
-            rect_vol = [left, 0, width, 0.8]
-            rect_main = [left, 0, width, 1.2]
-            for plot in plotList:   
-                if plot == 'K':
-                    drawCandlestick(rect_main, qs, False)
-                    if plot == 'V':
-                        drawVolumns(rect_vol, qs, True)
-        except Exception as e:
-            print(e);
-    elif datastyle=='realTick':
-        return
-    elif datastyle=='realTickToMin':
-        fname=readPath
-        qs = getDataFromCSV(fname,fromDate,toDate)
-        try:
-            left,width = 0, 3.5
-            rect_vol = [left, 0, width, 0.8]
-            rect_main = [left, 0, width, 1.2]
-            for plot in plotList:   
-                if plot == 'K':
-                    drawCandlestick(rect_main, qs, False)
-                    if plot == 'V':
-                        drawVolumns(rect_vol, qs, True)
-        except Exception as e:
-            print(e);
-    '''
 
 def getDataFromCSVWithDataStyle(datastyle,filePath, fromDate, toDate):
     quotes = pd.read_csv(filePath,encoding='gbk')
@@ -195,10 +156,10 @@ def getDataFromCSVWithDataStyle(datastyle,filePath, fromDate, toDate):
             floatday = date2num(datetimeDay)
             if i==0:
                 floatDayOne=floatday
-                print(floatDayOne)
+                #print(floatDayOne)
             elif i==(quotes.index.size-1):
                 floatDayEnd=floatday
-                print(floatDayEnd)
+                #print(floatDayEnd)
                 
             _o = float(df['open'])
             _c = float(df['close'])
@@ -244,10 +205,10 @@ def getDataFromCSVWithDataStyle(datastyle,filePath, fromDate, toDate):
             floatday = date2num(datetimeDay)
             if i==0:
                 floatDayOne=floatday
-                print(floatDayOne)
+                #print(floatDayOne)
             elif i==(quotes.index.size-1):
                 floatDayEnd=floatday
-                print(floatDayEnd)
+                #print(floatDayEnd)
             #print(floatday)
             _o = float(df['open'])
             _c = float(df['close'])
@@ -266,50 +227,3 @@ def getDataFromCSVWithDataStyle(datastyle,filePath, fromDate, toDate):
     return qs,w
     
         #datetimeDay = datetime.strptime(record[0], '%Y-%m-%d %H:%M:%S') #%H:%M:%S
-        
-    '''
-    for record in quotes:
-        if record[0] == 'date'or record[0] == 'time':
-            continue
-        print(record[0])
-        
-        if datastyle=='dayData':
-            datetimeDay = datetime.strptime(record[0]+' 13:00:00','%Y-%m-%d %H:%M:%S')
-        elif datastyle=='hisTick':
-            getDate=datetime.strftime(datetime.strptime(fromDate, '%Y-%m-%d %H:%M:%S'),'%Y-%m-%d ')
-            datetimeDay = datetime.strptime(getDate+record[0], '%Y-%m-%d %H:%M:%S')
-        elif datastyle=='hisTickToMin':
-            getDate=datetime.strftime(datetime.strptime(fromDate, '%Y-%m-%d %H:%M:%S'),'%Y-%m-%d ')
-            datetimeDay = datetime.strptime(getDate+record[0], '%Y-%m-%d %H:%M:%S')
-        elif datastyle=='realTick':
-            getDate=datetime.strftime(datetime.now(),'%Y-%m-%d ')
-            datetimeDay = datetime.strptime(getDate+record[0], '%Y-%m-%d %H:%M:%S')
-        elif datastyle=='realTickToMin':
-            getDate=datetime.strftime(datetime.now(),'%Y-%m-%d ')
-            datetimeDay = datetime.strptime(getDate+record[0], '%Y-%m-%d %H:%M:%S')
-        else:
-            print('No such type')
-        #datetimeDay = datetime.strptime(record[0], '%Y-%m-%d %H:%M:%S') #%H:%M:%S
-        t = datetimeDay.timestamp()
-        if (t > tdt):
-            continue
-        if (t < fdt):
-            break
-        floatday = date2num(datetimeDay)
-        _o = float(record[1])
-        _c = float(record[3])
-        _h = float(record[2])
-        _l = float(record[4])
-        _v = float(record[5])
-        #dates = np.append(dates,iday)
-        #volumns = np.append(volumns, _v)
-        quote = np.array([floatday, _o, _c, _h, _l, _v])
-        #print(quote)
-        if qs.size == 0:
-            qs = quote
-        else:
-            qs = np.vstack((qs, quote))
-    #print(qs)   
-    '''
-    
-      

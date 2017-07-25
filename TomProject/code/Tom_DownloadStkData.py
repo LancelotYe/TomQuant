@@ -91,8 +91,9 @@ def selectStkCodeList(codeList):
         os.remove(select_stk_code)
     df=pd.read_csv(stk_code, encoding='gbk')    
     df=df[df['code'].isin(codeList)]
+    name=(df['name'])
     df.to_csv(select_stk_code,index=False,encoding='gbk',date_format='str');
-    return pd.read_csv(select_stk_code, encoding='gbk')
+    return pd.read_csv(select_stk_code, encoding='gbk'),name
         
 #selectStkCodeList(codeList)
 

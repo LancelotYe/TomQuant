@@ -14,7 +14,7 @@ import datetime as dt
 datastyle=['dayData','hisTick','hisTickToMin','realTick','realTickToMin']
 '''
 def readStk(datastyle,date,cycle,code):
-    td.selectStkCodeList([int(code)])
+    selectDF,codename=td.selectStkCodeList([int(code)])
     fromDate=''
     toDate=''
     if datastyle=='dayData':
@@ -39,10 +39,6 @@ def readStk(datastyle,date,cycle,code):
             toD=dt.datetime.strptime(toD,'%Y-%m-%d')
             delta=dt.timedelta(days=1)
             if(startDate-frD)>=7*delta or (startDate-frD)<=-7*delta or toD-endDate>delta:
-                #print((startDate-frD)<=7*delta)
-                #print((frD-startDate)<=7*delta)
-                #print((toD-endDate)<=delta)
-                #print(date)
                 os.remove(readPath)
                 td.getStkFromFile(td.select_stk_code,date)
     elif datastyle=='hisTick':
@@ -98,11 +94,11 @@ def readStk(datastyle,date,cycle,code):
         return
     #print(readPath)
     df=pd.read_csv(readPath, encoding='gbk')
-    print(df)
-    print(readPath)
-    print(fromDate)
-    print(toDate)
-    return readPath,df,fromDate,toDate
+    #print(df)
+    #print(readPath)
+    #print(fromDate)
+    #print(toDate)
+    return readPath,df,fromDate,toDate,selectDF,codename
     
-rP,df,fromDate,toDate=readStk('hisTick','2015-02-25','01','000001')
+#rP,df,fromDate,toDate=readStk('hisTick','2015-02-25','01','000001')
 
