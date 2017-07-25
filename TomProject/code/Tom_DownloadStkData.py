@@ -84,7 +84,7 @@ def downBase():
 '''
 选取自定义股票
 '''
-codeList = [600129, 600192, 600231,600192]
+#codeList = [600129]
 
 def selectStkCodeList(codeList):
     if os.path.exists(select_stk_code):
@@ -92,7 +92,7 @@ def selectStkCodeList(codeList):
     df=pd.read_csv(stk_code, encoding='gbk')    
     df=df[df['code'].isin(codeList)]
     df.to_csv(select_stk_code,index=False,encoding='gbk',date_format='str');
-    
+    return pd.read_csv(select_stk_code, encoding='gbk')
         
 #selectStkCodeList(codeList)
 
@@ -118,12 +118,13 @@ def getStkFromFile(StkSourcePath,startTime):
     #股票代码文件 
     #filePath='./data/stk_code.csv';
     #startTime = '1994-01-01'
+    
     qx = zw.zwDatX(zw._rdatCN)
     zwx.down_stk_all(qx,StkSourcePath,startTime)
     
     
 #getStkFromFile(stk_code,'2017-05-01')
-#getStkFromFile(select_stk_code, '2017-05-01')
+#getStkFromFile(select_stk_code, '2010-04-01')
 
 #当天分时数据
 def getTodayTickAndCycle(StkSourcePath, cycles):
@@ -156,10 +157,11 @@ def transfToMinWithTick(tickSourceFile, outputMinDir, cycles):
     #fdat='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/tick/2016-05/2016-05-03/000001.csv'
     
     #fdat = tickSourceFile
-    tickSourceFile = '/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/min/tick/2015-01/2015-01-06_600192.csv'
+    #tickSourceFile = '/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/min/tick/2015-01/2015-01-06_600192.csv'
     #rsk='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/tick/2016-05/2016-05-03/'
     #qx.code='000001'
     #qx.min_ksgns=['01']
+    
     rsk=outputMinDir
     qx=zw.zwDatX()
     
@@ -170,6 +172,7 @@ def transfToMinWithTick(tickSourceFile, outputMinDir, cycles):
     #for code in codeList:
         #qx.code=code
     qx.min_ksgns=cycles
+    
     zwx.xtick2tim100(qx,tickSourceFile)
     zwx.xtick2minWr(qx, rsk)
 
@@ -210,7 +213,7 @@ def transToMinWithTickSourceDir(selectCodefile,tickSourceDir,outputMinDir,startd
         startdate+=delta
                     
 
-print(outputMinDir)
+#print(outputMinDir)
 #transToMinWithTickSourceDir(select_stk_code,tickSourceDir,outputMinDir,'2015-01-06','2015-01-12',['01','30'])
 
 #xstr = 'xxxx_123123'
