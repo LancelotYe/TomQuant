@@ -29,6 +29,7 @@ stk_hs300 = os.path.join(base, 'stk_hs300.csv')
 stk_zz500 = os.path.join(base, 'stk_zz500.csv')
 
 select_stk_code = os.path.join(base,'select_stk_code.csv')
+fav_stk_code = os.path.join(base,'fav_stk_code.csv')
 
 TomQuantData = zw.getTomQuantDataPath()
 his_tick_sourceDir = os.path.join(TomQuantData, 'min', 'tick')
@@ -84,7 +85,65 @@ def downBase():
 '''
 选取自定义股票
 '''
+data_style=['dayData','hisTick','hisTickToMin','realTick','realTickToMin']
 #codeList = [600129]
+#选中股票代码只能有一只
+def selectOneStkCode(code,datastyle,date,cycle):
+    if os.path.exists(select_stk_code):
+        os.remove(select_stk_code)
+    df=pd.read_csv(stk_code, encoding='gbk')    
+    df=df[df['code'].isin([code])]
+    #name=(df['name'])
+    df['datastyle']=datastyle
+    df['date']=date
+    df['cycle']=cycle
+    df.to_csv(select_stk_code,index=False,encoding='gbk',date_format='str');
+    return pd.read_csv(select_stk_code, encoding='gbk')
+
+def selectNextCodeInStkCode():
+    df=pd.read_csv(stk_code, encoding='gbk')
+    sdf=pd.read_csv(select_stk_code,encoding='gbk')
+    index=df[df['code']==sdf['code'][0]].index.values[0]
+    index+=1
+    df0=df[df.index==index]
+    df0['datastyle']=sdf.loc[0,'datastyle']
+    df0['date']=sdf.loc[0,'date']
+    df0['cycle']=sdf.loc[0,'cycle']
+    df0=pd.concat([df0],ignore_index=True)
+    df0.to_csv(select_stk_code,encoding='gbk')
+    return df0
+def selectCodeAddDate(xday):
+    df=pd.read_csv(select_stk_code,encoding='gbk')
+    date=df['date'].values[0]
+    date=dt.datetime.strptime(date,'%Y-%m-%d')
+    delta=dt.timedelta(days=1)
+    date+=xday*delta
+    date=dt.datetime.strftime(date,'%Y-%m-%d')
+    df['date']=date
+    df.to_csv(select_stk_code,encoding='gbk')
+    return df
+def selectCodeNextDatastyle():
+    df=pd.read_csv(select_stk_code,encoding='gbk')
+    datastyle=df['datastyle'].values[0]
+    index=0
+    for ds in data_style:
+        if ds==datastyle:
+            index=data_style.index(ds)
+    index+=1
+    if index>=len(data_style):
+        index=0
+    df['datastyle']=data_style[index]
+    df.to_csv(select_stk_code,encoding='gbk')
+    return df
+def selectCodeOtherCycle(cycle):
+    df=pd.read_csv(select_stk_code,encoding='gbk')
+    df['cycle']=cycle
+    df.to_csv(select_stk_code,encoding='gbk')
+    return df
+'''
+def selectOneStkCode(code):
+    return selectStkCodeList([code])
+
 
 def selectStkCodeList(codeList):
     if os.path.exists(select_stk_code):
@@ -94,10 +153,57 @@ def selectStkCodeList(codeList):
     name=(df['name'])
     df.to_csv(select_stk_code,index=False,encoding='gbk',date_format='str');
     return pd.read_csv(select_stk_code, encoding='gbk'),name
-        
+'''     
+
+    
 #selectStkCodeList(codeList)
+def addStkCodesToFav(codeList):
+    df=pd.read_csv(stk_code, encoding='gbk')
+    df=df[df['code'].isin(codeList)]
+    if df.size>1:
+        if os.path.exists(fav_stk_code):
+            #df.to_csv(fav_stk_code,index=False,encoding='gbk',date_format='str')
+            #else:
+            df0=pd.read_csv(fav_stk_code,encoding='gbk')
+            df=pd.concat([df0,df],ignore_index=True)
+            df=df[df.duplicated()==False].sort_values(by='code')
+        df.to_csv(fav_stk_code,index=False,encoding='gbk',date_format='str')
+        return df
+    else:
+        print('can not add this stk code')
+        return
+
+def removeStkFromFav(code):
+    if os.path.exists(fav_stk_code):
+        if code=='ALL':
+            os.remove(fav_stk_code)
+        df=pd.read_csv(fav_stk_code,encoding='gbk')
+        df0=df[df['code'].isin([code])]
+        if df0.size>1:
+            index=df0.index.values[0]
+            df=df.drop(index)
+            if df.size>1:
+                df.to_csv(fav_stk_code,encoding='gbk')
+            else:
+                os.remove(fav_stk_code)
+        
+
+#addStkCodesToFav(['603999','603980'])
+def getFavList():
+    return pd.read_csv(fav_stk_code,encoding='gbk')
+
+def getSelectList():
+    return pd.read_csv(select_stk_code,encoding='gbk')
+
+
+
 
 '''
+def selectNextStkCode():
+    if os.path.exists(select_stk_code):
+        df0=pd.read_csv(select_stk_code)
+        code=df0
+
 指数数据
 '''
 def getInxFromFile(filePath):

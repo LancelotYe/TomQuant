@@ -58,9 +58,9 @@ _rdatTickReal=_rdat0+"tickreal/"
 
 def gotoProjectPath():
     #tomMobileTank  
-    os.chdir('e:\\Users\\yjh19\\workspace\\TomQuant\\TomProject\\')
+    #os.chdir('e:\\Users\\yjh19\\workspace\\TomQuant\\TomProject\\')
     #TomMacBookAir   
-    #os.chdir('/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomProject/')
+    os.chdir('/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomProject/')
     #TomMacPro
     #os.chdir('/Users/yejunhai/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomProject/')    
     #print('[+]ProjectPath : '+ os.getcwd())

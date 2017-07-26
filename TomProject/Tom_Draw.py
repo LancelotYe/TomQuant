@@ -114,7 +114,8 @@ def drawVolumns(rect, qs, XLabelVisable):
     fig = plt.figure()
     ax_vol = fig.add_axes(rect)
     ax_vol.fill_between(dates, volumns, color = 'coral')
-    ax_vol.xaxis_date()
+    #ax_vol.xaxis_date()
+    ax_vol.xaxis.set_major_formatter(mdate.DateFormatter('%Y-%m-%d %H:%M'))
     plt.setp(ax_vol.get_xticklabels(), rotation= 30, horizontalalignment='right')
     plt.setp(ax_vol.get_xticklabels(), visible=XLabelVisable)
    
@@ -130,7 +131,7 @@ def drawTickPrices(rect, qs):
     #plt.xticks(dates)
     plt.grid()
     plt.show()
-def tomdraw(code,readPath,datastyle, fromDate, toDate, plotList):
+def tomdraw(readPath,datastyle, fromDate, toDate, plotList):
     plt.style.use('dark_background')
 #    date1 = (2017,1,1)
 #    date2 = (2017,6,1)

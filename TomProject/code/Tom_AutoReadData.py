@@ -14,7 +14,7 @@ import datetime as dt
 datastyle=['dayData','hisTick','hisTickToMin','realTick','realTickToMin']
 '''
 def readStk(datastyle,date,cycle,code):
-    selectDF,codename=td.selectStkCodeList([int(code)])
+    selectDF=td.selectOneStkCode(code,datastyle,date,cycle)
     fromDate=''
     toDate=''
     if datastyle=='dayData':
@@ -98,7 +98,45 @@ def readStk(datastyle,date,cycle,code):
     #print(readPath)
     #print(fromDate)
     #print(toDate)
-    return readPath,df,fromDate,toDate,selectDF,codename
-    
-#rP,df,fromDate,toDate=readStk('hisTick','2015-02-25','01','000001')
+    return readPath,df,fromDate,toDate,selectDF
 
+#rP,df,fromDate,toDate=readStk('hisTick','2015-02-25','01','000001')
+def readNextStk():
+    selectDF=td.selectNextCodeInStkCode()
+    code=selectDF.loc[0,'code']
+    code="%06d" %code
+    datastyle=selectDF.loc[0,'datastyle']
+    date=selectDF.loc[0,'date']
+    cycle=selectDF.loc[0,'cycle']
+    cycle="%02d" %cycle
+    return readStk(datastyle,date,cycle,code)
+
+def readAfterXDay(xday):
+    selectDF=td.selectCodeAddDate(xday)
+    code=selectDF.loc[0,'code']
+    code="%06d" %code
+    datastyle=selectDF.loc[0,'datastyle']
+    date=selectDF.loc[0,'date']
+    cycle=selectDF.loc[0,'cycle']
+    cycle="%02d" %cycle
+    return readStk(datastyle,date,cycle,code)
+
+def readNextDatastyleStk():
+    selectDF=td.selectCodeNextDatastyle()
+    code=selectDF.loc[0,'code']
+    code="%06d" %code
+    datastyle=selectDF.loc[0,'datastyle']
+    date=selectDF.loc[0,'date']
+    cycle=selectDF.loc[0,'cycle']
+    cycle="%02d" %cycle
+    return readStk(datastyle,date,cycle,code)
+
+def readOtherCycleData(cycle):
+    selectDF=td.selectCodeOtherCycle(cycle)
+    code=selectDF.loc[0,'code']
+    code="%06d" %code
+    datastyle=selectDF.loc[0,'datastyle']
+    date=selectDF.loc[0,'date']
+    cycle=selectDF.loc[0,'cycle']
+    cycle="%02d" %cycle
+    return readStk(datastyle,date,cycle,code)
