@@ -98,7 +98,7 @@ def readStk(datastyle,date,cycle,code):
     #print(readPath)
     #print(fromDate)
     #print(toDate)
-    return readPath,df,fromDate,toDate,selectDF
+    return readPath,df,fromDate,toDate,selectDF, datastyle
 
 #rP,df,fromDate,toDate=readStk('hisTick','2015-02-25','01','000001')
 def readNextStk():

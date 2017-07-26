@@ -131,14 +131,14 @@ def drawTickPrices(rect, qs):
     #plt.xticks(dates)
     plt.grid()
     plt.show()
-def tomdraw(readPath,datastyle, fromDate, toDate, plotList):
+def tomdraw(readPath,datastyle, fromDate, toDate):
     plt.style.use('dark_background')
 #    date1 = (2017,1,1)
 #    date2 = (2017,6,1)
 #    quotes = quotes_historical_yahoo_ohlc("INTC", date1, date2)
     #if datastyle=='dayData':
     fname=readPath
-    qs,w = getDataFromCSVWithDataStyle(datastyle,fname,fromDate,toDate)
+    qs,w,plotList= getDataFromCSVWithDataStyle(datastyle,fname,fromDate,toDate)
     try:
         left,width = 0, 2.5
         rect_vol = [left, 0, width, 0.8]
@@ -171,6 +171,7 @@ def getDataFromCSVWithDataStyle(datastyle,filePath, fromDate, toDate):
         return
     floatDayOne=float()
     floatDayEnd=float()
+    plotList=[]
     if datastyle=='dayData':
         for i,date in enumerate(quotes['date']):
             datetimeDay = datetime.strptime(date+' 13:00:00','%Y-%m-%d %H:%M:%S')
@@ -201,24 +202,20 @@ def getDataFromCSVWithDataStyle(datastyle,filePath, fromDate, toDate):
                 qs = quote
             else:
                 qs = np.vstack((qs, quote))
+        plotList=['K','V']
     else:
         for i,time in enumerate(quotes['time']):
             df=quotes[quotes.index==i]
             if datastyle=='hisTickToMin' or datastyle=='realTickToMin':
-                if datastyle=='hisTick':
+                if datastyle=='hisTickToMin':
                     getDate=datetime.strftime(datetime.strptime(fromDate, '%Y-%m-%d %H:%M:%S'),'%Y-%m-%d ')
-                    datetimeDay = datetime.strptime(getDate+time, '%Y-%m-%d %H:%M:%S')
-                elif datastyle=='hisTickToMin':
-                    getDate=datetime.strftime(datetime.strptime(fromDate, '%Y-%m-%d %H:%M:%S'),'%Y-%m-%d ')
-                    datetimeDay = datetime.strptime(getDate+time, '%Y-%m-%d %H:%M:%S')
-                elif datastyle=='realTick':
-                    getDate=datetime.strftime(datetime.now(),'%Y-%m-%d ')
                     datetimeDay = datetime.strptime(getDate+time, '%Y-%m-%d %H:%M:%S')
                 elif datastyle=='realTickToMin':
                     getDate=datetime.strftime(datetime.now(),'%Y-%m-%d ')
                     datetimeDay = datetime.strptime(getDate+time, '%Y-%m-%d %H:%M:%S')
                 else:
                     print('No such type')
+                plotList=['K','V']
                 t = datetimeDay.timestamp()
                 if (t > tdt):
                     continue
@@ -254,6 +251,7 @@ def getDataFromCSVWithDataStyle(datastyle,filePath, fromDate, toDate):
                     datetimeDay = datetime.strptime(getDate+time, '%Y-%m-%d %H:%M:%S')
                 else:
                     print('No such type')
+                plotList=['P']
                 t = datetimeDay.timestamp()
                 if (t > tdt):
                     continue
@@ -278,5 +276,5 @@ def getDataFromCSVWithDataStyle(datastyle,filePath, fromDate, toDate):
                 else:
                     qs=np.vstack((qs, quote))
     w =((floatDayOne-floatDayEnd)/quotes.index.size)/4
-    return qs,w
+    return qs,w,plotList
         #datetimeDay = datetime.strptime(record[0], '%Y-%m-%d %H:%M:%S') #%H:%M:%S
