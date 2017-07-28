@@ -43,6 +43,8 @@ hisTickPath=os.path.join(zw._rdatMin,'tick')
 hisTickToMinPath=os.path.join(zw._rdatMin)
 realTickPath=os.path.join(zw._rdatTickReal,'tick')
 realTickToMinPath=os.path.join(realTickPath)
+#单只股票一段时间的历史分时数据（包含多天的），有hisTickToMin组装而来
+hisCodeMinPath=os.path.join(zw._rdatMin)
 #
 '''
 基础文件数据
@@ -88,7 +90,7 @@ def downBase():
 data_style=['dayData','hisTick','hisTickToMin','realTick','realTickToMin']
 #codeList = [600129]
 #选中股票代码只能有一只
-def selectOneStkCode(code,datastyle,date,cycle):
+def selectOneStkCode(code,datastyle,date,cycle,hisCodeMinEndDate):
     if os.path.exists(select_stk_code):
         os.remove(select_stk_code)
     df=pd.read_csv(stk_code, encoding='gbk')    
@@ -97,6 +99,7 @@ def selectOneStkCode(code,datastyle,date,cycle):
     df['datastyle']=datastyle
     df['date']=date
     df['cycle']=cycle
+    df['hisCodeMinEndDate']=hisCodeMinEndDate
     df.to_csv(select_stk_code,index=False,encoding='gbk',date_format='str');
     return pd.read_csv(select_stk_code, encoding='gbk')
 
@@ -138,6 +141,12 @@ def selectCodeNextDatastyle():
 def selectCodeOtherCycle(cycle):
     df=pd.read_csv(select_stk_code,encoding='gbk')
     df['cycle']=cycle
+    df.to_csv(select_stk_code,encoding='gbk')
+    return df
+
+def selectCodeOtherHisCodeMinEndDate(hisCodeMinEndDate):
+    df=pd.read_csv(select_stk_code,encoding='gbk')
+    df['hisCodeMinEndDate']=hisCodeMinEndDate
     df.to_csv(select_stk_code,encoding='gbk')
     return df
 '''
@@ -242,7 +251,7 @@ def getTodayTickAndCycle(StkSourcePath, cycles):
 #getTodayTickAndCycle(stk_code, ['01','05','30'])
 #getTodayTickAndCycle(select_stk_code,['01','05','30'])
 '''
-历史分时数据
+历史Tick数据
 '''
 def getPastTick(StkSourcePath,startDate,endDate):
     #testfinx='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/Base/stk_test.csv'
@@ -279,11 +288,9 @@ def transfToMinWithTick(tickSourceFile, outputMinDir, cycles):
     #for code in codeList:
         #qx.code=code
     qx.min_ksgns=cycles
-    
     zwx.xtick2tim100(qx,tickSourceFile)
     zwx.xtick2minWr(qx, rsk)
-
-
+    
 
 
 '''
@@ -294,32 +301,61 @@ cycle指定修改的周期列表
 '''
 def transToMinWithTickSourceDir(selectCodefile,tickSourceDir,outputMinDir,startdate,enddate,cycles):
     #date='2015-01-01'
-    selectCodes=pd.read_csv(selectCodefile,encoding='gbk')['code']
+    sdf=pd.read_csv(selectCodefile,encoding='gbk')
+    selectCodes=sdf['code']
+    #print[selectCodes]
     os.chdir(tickSourceDir)
     os.listdir()
-    startdate=dt.datetime.strptime(startdate, '%Y-%m-%d')
-    startdate=dt.datetime.strptime('2015-01-06', '%Y-%m-%d')
-    enddate=dt.datetime.strptime(enddate, '%Y-%m-%d')
+    sd=dt.datetime.strptime(startdate, '%Y-%m-%d')
+    #startdate=dt.datetime.strptime('2015-01-06', '%Y-%m-%d')
+    ed=dt.datetime.strptime(enddate, '%Y-%m-%d')
     delta=dt.timedelta(days=1)
-    while(startdate<=enddate):
-        getYM=startdate.strftime('%Y-%m')
+    while(sd<=ed):
+        getYM=sd.strftime('%Y-%m')
         for d in os.listdir():
             if d == getYM:
                 mouthDir=os.path.join(tickSourceDir,getYM)
-                datestr=startdate.strftime('%Y-%m-%d')
+                datestr=sd.strftime('%Y-%m-%d')
                 for f in os.listdir(mouthDir):
                     if f.startswith(datestr):
                         for code in selectCodes:
                             if f.split('_')[1].split('.')[0]==str(code):
                                 f=os.path.join(mouthDir, f)
-                                print(f)
+                                #print(f)
                                 outD=os.path.join(outputMinDir,datestr)
                                 if not os.path.exists(outD):
                                     os.makedirs(outD)
-                                    transfToMinWithTick(f,outD,cycles)
-        startdate+=delta
-                    
-
+                                transfToMinWithTick(f,outD,cycles)
+        sd+=delta
+    #转换完成以后才能合并所以不能合在一起
+    for code in selectCodes:
+        for cycle in cycles:
+            mergeMinData(startdate,enddate,cycle,str(code))
+#批量下载才允许合并
+def mergeMinData(startdate,enddate,cycle,code):
+    delta=dt.timedelta(days=1)
+    sd=dt.datetime.strptime(startdate,'%Y-%m-%d')
+    ed=dt.datetime.strptime(enddate,'%Y-%m-%d')
+    df=pd.DataFrame()
+    #cycle=1
+    cycle='M'+'%02d' %int(cycle)
+    code='%06d' %int(code)
+    print(code)
+    while(sd<=ed):
+        datestr=dt.datetime.strftime(sd,'%Y-%m-%d')
+        hisMinFilePath=os.path.join(outputMinDir,datestr,cycle,code+'.csv')
+        print(hisMinFilePath)
+        df0=pd.read_csv(hisMinFilePath, encoding='gbk')
+        for i in range(df0.index.size):
+            df0.at[i,'time']=datestr+' '+str(df0.loc[i,'time'])
+        if df.size<5:
+            df=df0
+        else:
+            df=pd.concat([df,df0],ignore_index=True)
+        sd+=delta
+    outputPath=os.path.join(hisCodeMinPath,cycle,code+'.csv')
+    df.to_csv(outputPath, encoding='gbk')
+    #print(df)
 #print(outputMinDir)
 #transToMinWithTickSourceDir(select_stk_code,tickSourceDir,outputMinDir,'2015-01-06','2015-01-12',['01','30'])
 

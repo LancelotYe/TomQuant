@@ -353,7 +353,6 @@ def xtick2tim100(qx,fdat):
     根据输入的fdat文件名，读取tick分笔数据，并转换为对应的分时数据：5/15/30/60 分钟
     【输入】
     fdat，rick数据文件名
-    
     '''
     xfg=os.path.exists(fdat);#print('x100',xfg,fdat)
     if xfg:

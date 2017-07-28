@@ -4,7 +4,7 @@ import Tom_Draw as tda
 import pandas as pd
 
 
-rP,df,fromDate,toDate,selectDF,datastyle=ta.readOtherCycleData(20)# -*- coding: utf-8 -*-
+rP,df,fromDate,toDate,selectDF,datastyle=ta.readOtherCycleData(2)# -*- coding: utf-8 -*-
 
 tda.tomdraw(rP,datastyle,fromDate,toDate)
 print(df)

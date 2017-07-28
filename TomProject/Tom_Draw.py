@@ -143,7 +143,7 @@ def tomdraw(readPath,datastyle, fromDate, toDate):
         left,width = 0, 2.5
         rect_vol = [left, 0, width, 0.8]
         rect_main = [left, 0, width, 1.2]
-        rect_price = [left,0, width, 1.2]
+        rect_price = [left,0, width, 2.0]
         for plot in plotList:   
             if plot == 'K':
                 drawCandlestick(w,rect_main, qs, False)
