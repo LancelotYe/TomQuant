@@ -13,8 +13,10 @@ import datetime as dt
 '''
 datastyle=['dayData','hisTick','hisTickToMin','realTick','realTickToMin','hisCodeMin']
 '''
-def readStk(datastyle,date,cycle,code,hisCodeMinEndDate):
-    selectDF=td.selectOneStkCode(code,datastyle,date,cycle,hisCodeMinEndDate)
+#def readStk(datastyle,date,cycle,code,hisCodeMinEndDate):
+
+def readStk(datastyle,date,cycle,code):
+    selectDF=td.selectOneStkCode(code,datastyle,date,cycle)
     fromDate=''
     toDate=''
     delta=dt.timedelta(days=1)
@@ -86,33 +88,35 @@ def readStk(datastyle,date,cycle,code,hisCodeMinEndDate):
         tdf=pd.read_csv(readPath, encoding='gbk')
         fromDate=dt.datetime.strftime(dt.datetime.now(),'%Y-%m-%d')+' '+tdf.tail(1)['time'].values[0]
         toDate=dt.datetime.strftime(dt.datetime.now(),'%Y-%m-%d')+' '+tdf.head(1)['time'].values[0]
+        '''
     elif datastyle=='hisCodeMin':
+        
         readPath=td.hisCodeMinPath
         readPath=os.path.join(readPath,'M'+cycle,code+'.csv')
         if os.path.exists(readPath)==False:
             sd=dt.datetime.strptime(date,'%Y-%m-%d')
             ed=dt.datetime.strptime(hisCodeMinEndDate,'%Y-%m-%d')
             while(sd<=ed):
-                '''
                 sdstr=dt.datetime.strftime(sd,'%Y-%m-%d')
-                readPath=td.hisTickPath
+                xReadPath=td.hisTickPath
                 #date='1992-01-03'
                 Ddate=dt.datetime.strptime(date,'%Y-%m-%d')
                 Tdate=Ddate+delta
                 tdate=dt.datetime.strftime(Tdate,'%Y-%m-%d')
                 getYM=dt.datetime.strftime(Ddate,'%Y-%m')
-                readPath=os.path.join(readPath,getYM,date+'_'+code+'.csv')
-                if os.path.exists(readPath)==False:
+                xReadPath=os.path.join(xReadPath,getYM,date+'_'+code+'.csv')
+                if os.path.exists(xReadPath)==False:
                     td.getPastTick(td.select_stk_code,date,tdate)
-                    tdf=pd.read_csv(readPath, encoding='gbk')
-                    fromDate=date+' '+tdf.tail(1)['time'].values[0]
-                    toDate=date+' '+tdf.head(1)['time'].values[0]
+                    tdf=pd.read_csv(xReadPath, encoding='gbk')
+                    #fromDate=date+' '+tdf.tail(1)['time'].values[0]
+                    #toDate=date+' '+tdf.head(1)['time'].values[0]
                 sd+=delta
-                '''
+                
             td.transToMinWithTickSourceDir(td.select_stk_code,td.his_tick_sourceDir,td.outputMinDir,date,hisCodeMinEndDate,[cycle])
         df=pd.read_csv(readPath,encoding='gbk')
         fromDate=df.loc[df.index.size-1,'time']
         toDate=df.loc[0,'time']
+        '''
     else:
         print('No such type')
         return
@@ -133,8 +137,8 @@ def readNextStk():
     date=selectDF.loc[0,'date']
     cycle=selectDF.loc[0,'cycle']
     cycle="%02d" %cycle
-    hisCodeMinEndDate=selectDF.loc[0,'hisCodeMinEndDate']
-    return readStk(datastyle,date,cycle,code,hisCodeMinEndDate)
+    #hisCodeMinEndDate=selectDF.loc[0,'hisCodeMinEndDate']
+    return readStk(datastyle,date,cycle,code)
 
 def readAfterXDay(xday):
     selectDF=td.selectCodeAddDate(xday)
@@ -144,8 +148,8 @@ def readAfterXDay(xday):
     date=selectDF.loc[0,'date']
     cycle=selectDF.loc[0,'cycle']
     cycle="%02d" %cycle
-    hisCodeMinEndDate=selectDF.loc[0,'hisCodeMinEndDate']
-    return readStk(datastyle,date,cycle,code,hisCodeMinEndDate)
+    #hisCodeMinEndDate=selectDF.loc[0,'hisCodeMinEndDate']
+    return readStk(datastyle,date,cycle,code)
 
 def readNextDatastyleStk():
     selectDF=td.selectCodeNextDatastyle()
@@ -155,8 +159,8 @@ def readNextDatastyleStk():
     date=selectDF.loc[0,'date']
     cycle=selectDF.loc[0,'cycle']
     cycle="%02d" %cycle
-    hisCodeMinEndDate=selectDF.loc[0,'hisCodeMinEndDate']
-    return readStk(datastyle,date,cycle,code,hisCodeMinEndDate)
+    #hisCodeMinEndDate=selectDF.loc[0,'hisCodeMinEndDate']
+    return readStk(datastyle,date,cycle,code)
 
 def readOtherCycleData(cycle):
     selectDF=td.selectCodeOtherCycle(cycle)
@@ -166,10 +170,10 @@ def readOtherCycleData(cycle):
     date=selectDF.loc[0,'date']
     cycle=selectDF.loc[0,'cycle']
     cycle="%02d" %cycle
-    hisCodeMinEndDate=selectDF.loc[0,'hisCodeMinEndDate']
-    return readStk(datastyle,date,cycle,code,hisCodeMinEndDate)
-
-def  readOtherHisCodeMinEndDate(hisCodeMinEndDate):
+    #hisCodeMinEndDate=selectDF.loc[0,'hisCodeMinEndDate']
+    return readStk(datastyle,date,cycle,code)
+'''
+def readOtherHisCodeMinEndDate(hisCodeMinEndDate):
     selectDF=td.selectCodeOtherHisCodeMinEndDate(hisCodeMinEndDate)
     code=selectDF.loc[0,'code']
     code="%06d" %code
@@ -179,3 +183,4 @@ def  readOtherHisCodeMinEndDate(hisCodeMinEndDate):
     cycle="%02d" %cycle
     hisCodeMinEndDate=selectDF.loc[0,'hisCodeMinEndDate']
     return readStk(datastyle,date,cycle,code,hisCodeMinEndDate)
+'''

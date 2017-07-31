@@ -12,6 +12,8 @@ import zwSys as zw
 import zwQTBox as zwx
 import zwTools as zwt
 
+import Tom_tools as tt
+
 
 #import Tom_Prefix as tp
 
@@ -88,24 +90,73 @@ def downBase():
 选取自定义股票
 '''
 data_style=['dayData','hisTick','hisTickToMin','realTick','realTickToMin']
+def initDatDateSelectFileWithCode(code,date):
+    datastyle='dayData'
+    if not tt.isExist(tt.select_stk_code):
+        selectOneStkCode(code,datastyle,date,'05')
+    else:
+        selectOtherCode(code)
+        selectOtherDate(date)
+        selectCodeOtherDatastyle(datastyle)
+    return getSelectList(),data_style
+def initRealTickSelectFileWithCode(code,date):
+    datastyle='realTick'
+    if not tt.isExist(tt.select_stk_code):
+        selectOneStkCode(code,datastyle,date,'05')
+    else:
+        selectOtherCode(code)
+        selectOtherDate(date)
+        selectCodeOtherDatastyle(datastyle)
+    return getSelectList(), datastyle
+def initRealTickToMinSelectFileWithCode(code,date,cycle):
+    datastyle='realTickToMin'
+    if not tt.isExist(tt.select_stk_code)
+        selectOneStkCode(code,datastyle,date,cycle)
+    else:
+        selectOtherCode(code)
+        selectOtherDate(date)
+        selectCodeOtherDatastyle(datastyle)
+        selectCodeOtherCycle(cycle)
+    return getSelectList(),datastyle
+#只获取date日的Tick数据
+def initHisTickSelectFileWithCode(code,date):
+    datastyle='hisTick'
+    if not tt.isExist(tt.select_stk_code):
+        selectOneStkCode(code,datastyle,date,'05')
+    else:
+        selectOtherCode(code)
+        selectOtherDate(date)
+        selectCodeOtherDatastyle(datastyle)
+        selectCodeOtherCycle(cycle)
+    return getSelectList(),datastyle
+def initHisTickToMinSelectFileWithCode(code,date,cycle):
+    datastyle='hisTickToMin'
+    if not tt.isExist(tt.select_stk_code):
+        selectOneStkCode(code,datastyle,date,cycle)
+    else:
+        selectOtherCode(code)
+        selectOtherDate(date)
+        selectCodeOtherCycle(cycle)
+        selectCodeOtherDatastyle(datastyle)
+    return getSelectList(),datastyle
 #codeList = [600129]
 #选中股票代码只能有一只
-def selectOneStkCode(code,datastyle,date,cycle,hisCodeMinEndDate):
-    if os.path.exists(select_stk_code):
-        os.remove(select_stk_code)
-    df=pd.read_csv(stk_code, encoding='gbk')    
+def selectOneStkCode(code,datastyle,date,cycle):
+    tt.remove(tt.select_stk_code)
+    #df=pd.read_csv(tt.stk_code, encoding='gbk')
+    df=getSelectList()
     df=df[df['code'].isin([code])]
-    #name=(df['name'])
     df['datastyle']=datastyle
     df['date']=date
     df['cycle']=cycle
-    df['hisCodeMinEndDate']=hisCodeMinEndDate
-    df.to_csv(select_stk_code,index=False,encoding='gbk',date_format='str');
-    return pd.read_csv(select_stk_code, encoding='gbk')
-
+    #df['hisCodeMinEndDate']=hisCodeMinEndDate
+    tt.saveDf(tt.select_stk_code,df)
+    #df.to_csv(select_stk_code,index=False,encoding='gbk',date_format='str');
+    return tt.readDf(tt.select_stk_code)
 def selectNextCodeInStkCode():
-    df=pd.read_csv(stk_code, encoding='gbk')
-    sdf=pd.read_csv(select_stk_code,encoding='gbk')
+    df=tt.readDf(tt.stk_code)
+    #sdf=tt.readDf(tt.select_stk_code)
+    sdf=getSelectList()
     index=df[df['code']==sdf['code'][0]].index.values[0]
     index+=1
     df0=df[df.index==index]
@@ -113,20 +164,35 @@ def selectNextCodeInStkCode():
     df0['date']=sdf.loc[0,'date']
     df0['cycle']=sdf.loc[0,'cycle']
     df0=pd.concat([df0],ignore_index=True)
-    df0.to_csv(select_stk_code,encoding='gbk')
+    tt.saveDf(tt.select_stk_code,df0)
     return df0
+def selectOtherCode(code):
+    df=getSelectList()
+    df['code']=code
+    tt.saveDf(tt.select_stk_code,df)
+    return df
 def selectCodeAddDate(xday):
-    df=pd.read_csv(select_stk_code,encoding='gbk')
+    #df=pd.read_csv(select_stk_code,encoding='gbk')
+    #df=tt.readDf(select_stk_code)
+    df=getSelectList()
     date=df['date'].values[0]
-    date=dt.datetime.strptime(date,'%Y-%m-%d')
-    delta=dt.timedelta(days=1)
-    date+=xday*delta
-    date=dt.datetime.strftime(date,'%Y-%m-%d')
+    #date=dt.datetime.strptime(date,'%Y-%m-%d')
+    date=tt.str2dateYmd(date)
+    date+=xday*tt.one_Day_Delta
+    #date=dt.datetime.strftime(date,'%Y-%m-%d')
+    date=tt.dateYmd2str(date)
     df['date']=date
-    df.to_csv(select_stk_code,encoding='gbk')
+    tt.saveDf(tt.select_stk_code,df)
+    return df
+def selectOtherDate(date):
+    df=getSelectList()
+    df['date']=date
+    tt.saveDf(tt.select_stk_code,df)
     return df
 def selectCodeNextDatastyle():
-    df=pd.read_csv(select_stk_code,encoding='gbk')
+    #df=pd.read_csv(select_stk_code,encoding='gbk')
+    #df=tt.readDf(tt.select_stk_code)
+    df=getSelectList()
     datastyle=df['datastyle'].values[0]
     index=0
     for ds in data_style:
@@ -136,20 +202,31 @@ def selectCodeNextDatastyle():
     if index>=len(data_style):
         index=0
     df['datastyle']=data_style[index]
-    df.to_csv(select_stk_code,encoding='gbk')
+    #df.to_csv(select_stk_code,encoding='gbk')
+    tt.saveDf(tt.select_stk_code,df)
     return df
+def selectCodeOtherDatastyle(datastyle):
+    df=getSelectList()
+    df['datastyle']=datastyle
+    tt.saveDf(tt.select_stk_code,df)
 def selectCodeOtherCycle(cycle):
-    df=pd.read_csv(select_stk_code,encoding='gbk')
+    #df=pd.read_csv(select_stk_code,encoding='gbk')
+    #df=tt.readDf(tt.select_stk_code)
+    df=getSelectList()
     df['cycle']=cycle
-    df.to_csv(select_stk_code,encoding='gbk')
+    tt.saveDf(tt.select_stk_code,df)
+    #df.to_csv(select_stk_code,encoding='gbk')
     return df
-
+def getSelectList():
+    return tt.readDf(tt.select_stk_code)
+    #return pd.read_csv(select_stk_code,encoding='gbk')
+'''
 def selectCodeOtherHisCodeMinEndDate(hisCodeMinEndDate):
     df=pd.read_csv(select_stk_code,encoding='gbk')
     df['hisCodeMinEndDate']=hisCodeMinEndDate
     df.to_csv(select_stk_code,encoding='gbk')
     return df
-'''
+
 def selectOneStkCode(code):
     return selectStkCodeList([code])
 
@@ -170,49 +247,44 @@ def addStkCodesToFav(codeList):
     df=pd.read_csv(stk_code, encoding='gbk')
     df=df[df['code'].isin(codeList)]
     if df.size>1:
-        if os.path.exists(fav_stk_code):
+        if tt.isExist(fav_stk_code):
             #df.to_csv(fav_stk_code,index=False,encoding='gbk',date_format='str')
             #else:
-            df0=pd.read_csv(fav_stk_code,encoding='gbk')
+            df0=tt.readDf(fav_stk_code)
             df=pd.concat([df0,df],ignore_index=True)
             df=df[df.duplicated()==False].sort_values(by='code')
-        df.to_csv(fav_stk_code,index=False,encoding='gbk',date_format='str')
+        tt.saveDf(fav_stk_code, df)
+        #df.to_csv(fav_stk_code,index=False,encoding='gbk',date_format='str')
         return df
     else:
         print('can not add this stk code')
         return
 
 def removeStkFromFav(code):
-    if os.path.exists(fav_stk_code):
+    if tt.isExist(fav_stk_code):
         if code=='ALL':
-            os.remove(fav_stk_code)
-        df=pd.read_csv(fav_stk_code,encoding='gbk')
+            #os.remove(fav_stk_code)
+            #tt.readDf(fav_stk_code)
+            tt.remove(fav_stk_code)
+        #df=pd.read_csv(fav_stk_code,encoding='gbk')
+        df=tt.readDf(fav_stk_code)
         df0=df[df['code'].isin([code])]
         if df0.size>1:
             index=df0.index.values[0]
             df=df.drop(index)
             if df.size>1:
-                df.to_csv(fav_stk_code,encoding='gbk')
+                #df.to_csv(fav_stk_code,encoding='gbk')
+                tt.saveDf(fav_stk_code,df)
             else:
-                os.remove(fav_stk_code)
+                #os.remove(fav_stk_code)
+                tt.remove(fav_stk_code)
         
 
 #addStkCodesToFav(['603999','603980'])
 def getFavList():
-    return pd.read_csv(fav_stk_code,encoding='gbk')
-
-def getSelectList():
-    return pd.read_csv(select_stk_code,encoding='gbk')
-
-
-
+    return tt.readDf(fav_stk_code)
 
 '''
-def selectNextStkCode():
-    if os.path.exists(select_stk_code):
-        df0=pd.read_csv(select_stk_code)
-        code=df0
-
 指数数据
 '''
 def getInxFromFile(filePath):
@@ -223,9 +295,13 @@ def getInxFromFile(filePath):
     
 #getInxFromFile(stk_inx0)
 
+
 '''
 个股数据指定日期至今的日结数据
 '''
+
+
+
 #日数据
 #传入周期，和文件路径
 def getStkFromFile(StkSourcePath,startTime): 
@@ -234,15 +310,35 @@ def getStkFromFile(StkSourcePath,startTime):
     #股票代码文件 
     #filePath='./data/stk_code.csv';
     #startTime = '1994-01-01'
-    
     qx = zw.zwDatX(zw._rdatCN)
     zwx.down_stk_all(qx,StkSourcePath,startTime)
     
-    
+#获取code从starttime起的日数据
+def getStkDayDateToSelectFile(code,startTime):
+    #readPath=os.path.join(dayDataPath,code+'.csv')
+    #selectDF=selectOneStkCode(code,datastyle,date,cycle)
+    selectDF,datastyle=initDatDateSelectFileWithCode(code,startTime)
+    readPath=tt.joinPath(tt.dayDataDir,code+'.csv')
+    if os.path.exists(readPath)==False:
+        getStkFromFile(select_stk_code,startTime)
+    else:
+        #tdf=pd.read_csv(readPath,encoding='gbk')
+        tdf=tt.readDf(readPath)
+        sd=tt.str2dateYmd(startTime)
+        ed=tt.today_Date
+        fd=tt.str2dateYmd(tdf.tail(1)['date'].values[0])
+        td=tt.str2dateYmd(tdf.head(1)['date'].values[0])
+        if abs((fd-sd)/tt.one_Day_Delta)>=3 or ed>td:
+            tt.remove(readPath)
+            fd,td=sd,ed
+            getStkFromFile(select_stk_code,startTime)
+    tdf=tt.readDf(readPath)
+    fromDate=tt.str2dateYmd(tdf.tail(1)['date'].values[0])+' '+tt.endTradeTime
+    toDate=tt.str2dateYmd(tdf.head(1)['date'].values[0])+' '+tt.endTradeTime
+    return readPath,tdf,fromDate,toDate,selectDF,datastyle
 #getStkFromFile(stk_code,'2017-05-01')
 #getStkFromFile(select_stk_code, '2010-04-01')
-
-#当天分时数据
+#当天tick数据数据并转换成分时数据
 def getTodayTickAndCycle(StkSourcePath, cycles):
     qx = zw.zwDatX(zw._rdatTickReal)
     #qx.ksgns=cycles
@@ -250,6 +346,12 @@ def getTodayTickAndCycle(StkSourcePath, cycles):
     
 #getTodayTickAndCycle(stk_code, ['01','05','30'])
 #getTodayTickAndCycle(select_stk_code,['01','05','30'])
+
+def getStkCodeTodayTickData(code):
+    selectDF=initRealTick
+    readPath=tt.realTickPath
+    readPath=tt.joinPath(readPath,code+'.csv')
+    
 '''
 历史Tick数据
 '''
@@ -270,23 +372,9 @@ def getPastTick(StkSourcePath,startDate,endDate):
 #getPastTick(select_stk_code,'2015-01-03','2016-03-04')
 #这个方法可以将任意tick数据转化成定制的
 def transfToMinWithTick(tickSourceFile, outputMinDir, cycles):
-    #fdat='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/tick/2016-05/2016-05-03/000001.csv'
-    
-    #fdat = tickSourceFile
-    #tickSourceFile = '/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/min/tick/2015-01/2015-01-06_600192.csv'
-    #rsk='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/tick/2016-05/2016-05-03/'
-    #qx.code='000001'
-    #qx.min_ksgns=['01']
-    
     rsk=outputMinDir
     qx=zw.zwDatX()
-    
     qx.code=tickSourceFile.split(os.path.sep)[-1].split('_')[1].split('.')[0]
-    #df=pd.read_csv(select_stk_code,encoding='gbk')
-    #df=pd.read_csv(tickSourceFile,encoding='gbk')
-    #codeList=df['code']
-    #for code in codeList:
-        #qx.code=code
     qx.min_ksgns=cycles
     zwx.xtick2tim100(qx,tickSourceFile)
     zwx.xtick2minWr(qx, rsk)
@@ -327,10 +415,12 @@ def transToMinWithTickSourceDir(selectCodefile,tickSourceDir,outputMinDir,startd
                                     os.makedirs(outD)
                                 transfToMinWithTick(f,outD,cycles)
         sd+=delta
+    '''
     #转换完成以后才能合并所以不能合在一起
     for code in selectCodes:
         for cycle in cycles:
             mergeMinData(startdate,enddate,cycle,str(code))
+    '''
 #批量下载才允许合并
 def mergeMinData(startdate,enddate,cycle,code):
     delta=dt.timedelta(days=1)
@@ -355,6 +445,10 @@ def mergeMinData(startdate,enddate,cycle,code):
         sd+=delta
     outputPath=os.path.join(hisCodeMinPath,cycle,code+'.csv')
     df.to_csv(outputPath, encoding='gbk')
+    
+    
+
+#def mergeTwoTick
     #print(df)
 #print(outputMinDir)
 #transToMinWithTickSourceDir(select_stk_code,tickSourceDir,outputMinDir,'2015-01-06','2015-01-12',['01','30'])
