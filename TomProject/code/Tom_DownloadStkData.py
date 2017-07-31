@@ -99,22 +99,20 @@ def initDatDateSelectFileWithCode(code,date):
         selectOtherDate(date)
         selectCodeOtherDatastyle(datastyle)
     return getSelectList(),data_style
-def initRealTickSelectFileWithCode(code,date):
+def initRealTickSelectFileWithCode(code):
     datastyle='realTick'
     if not tt.isExist(tt.select_stk_code):
-        selectOneStkCode(code,datastyle,date,'05')
+        selectOneStkCode(code,datastyle,tt.today_Date_Ymd_Str,'05')
     else:
         selectOtherCode(code)
-        selectOtherDate(date)
         selectCodeOtherDatastyle(datastyle)
     return getSelectList(), datastyle
-def initRealTickToMinSelectFileWithCode(code,date,cycle):
+def initRealTickToMinSelectFileWithCode(code,cycle):
     datastyle='realTickToMin'
-    if not tt.isExist(tt.select_stk_code)
-        selectOneStkCode(code,datastyle,date,cycle)
+    if not tt.isExist(tt.select_stk_code):
+        selectOneStkCode(code,datastyle,tt.today_Date_Ymd_Str,cycle)
     else:
         selectOtherCode(code)
-        selectOtherDate(date)
         selectCodeOtherDatastyle(datastyle)
         selectCodeOtherCycle(cycle)
     return getSelectList(),datastyle
@@ -127,7 +125,6 @@ def initHisTickSelectFileWithCode(code,date):
         selectOtherCode(code)
         selectOtherDate(date)
         selectCodeOtherDatastyle(datastyle)
-        selectCodeOtherCycle(cycle)
     return getSelectList(),datastyle
 def initHisTickToMinSelectFileWithCode(code,date,cycle):
     datastyle='hisTickToMin'
@@ -287,23 +284,21 @@ def getFavList():
 '''
 指数数据
 '''
+#getInxFromFile(stk_inx0)
 def getInxFromFile(filePath):
     #下载大盘指数文件，
     #filepath = 'data/inx_code.csv';
     qx=zw.zwDatX(zw._rdatCN);
     zwx.down_stk_inx(qx, filePath)
-    
-#getInxFromFile(stk_inx0)
-
 
 '''
 个股数据指定日期至今的日结数据
 '''
 
-
-
 #日数据
 #传入周期，和文件路径
+#getStkFromFile(stk_code,'2017-05-01')
+#getStkFromFile(select_stk_code, '2010-04-01')
 def getStkFromFile(StkSourcePath,startTime): 
    #自动下载，追加数据
    #-------设置参数       
@@ -313,45 +308,18 @@ def getStkFromFile(StkSourcePath,startTime):
     qx = zw.zwDatX(zw._rdatCN)
     zwx.down_stk_all(qx,StkSourcePath,startTime)
     
-#获取code从starttime起的日数据
-def getStkDayDateToSelectFile(code,startTime):
-    #readPath=os.path.join(dayDataPath,code+'.csv')
-    #selectDF=selectOneStkCode(code,datastyle,date,cycle)
-    selectDF,datastyle=initDatDateSelectFileWithCode(code,startTime)
-    readPath=tt.joinPath(tt.dayDataDir,code+'.csv')
-    if os.path.exists(readPath)==False:
-        getStkFromFile(select_stk_code,startTime)
-    else:
-        #tdf=pd.read_csv(readPath,encoding='gbk')
-        tdf=tt.readDf(readPath)
-        sd=tt.str2dateYmd(startTime)
-        ed=tt.today_Date
-        fd=tt.str2dateYmd(tdf.tail(1)['date'].values[0])
-        td=tt.str2dateYmd(tdf.head(1)['date'].values[0])
-        if abs((fd-sd)/tt.one_Day_Delta)>=3 or ed>td:
-            tt.remove(readPath)
-            fd,td=sd,ed
-            getStkFromFile(select_stk_code,startTime)
-    tdf=tt.readDf(readPath)
-    fromDate=tt.str2dateYmd(tdf.tail(1)['date'].values[0])+' '+tt.endTradeTime
-    toDate=tt.str2dateYmd(tdf.head(1)['date'].values[0])+' '+tt.endTradeTime
-    return readPath,tdf,fromDate,toDate,selectDF,datastyle
-#getStkFromFile(stk_code,'2017-05-01')
-#getStkFromFile(select_stk_code, '2010-04-01')
+
+
 #当天tick数据数据并转换成分时数据
+#getTodayTickAndCycle(stk_code, ['01','05','30'])
+#getTodayTickAndCycle(select_stk_code,['01','05','30'])
 def getTodayTickAndCycle(StkSourcePath, cycles):
     qx = zw.zwDatX(zw._rdatTickReal)
     #qx.ksgns=cycles
     zwx.xtick_real_down_all(qx,StkSourcePath,cycles)
     
-#getTodayTickAndCycle(stk_code, ['01','05','30'])
-#getTodayTickAndCycle(select_stk_code,['01','05','30'])
 
-def getStkCodeTodayTickData(code):
-    selectDF=initRealTick
-    readPath=tt.realTickPath
-    readPath=tt.joinPath(readPath,code+'.csv')
-    
+
 '''
 历史Tick数据
 '''
@@ -378,8 +346,6 @@ def transfToMinWithTick(tickSourceFile, outputMinDir, cycles):
     qx.min_ksgns=cycles
     zwx.xtick2tim100(qx,tickSourceFile)
     zwx.xtick2minWr(qx, rsk)
-    
-
 
 '''
 tickSourceDir指定需要转换的历史tick数据父路径../TomQuantData/min/tick
@@ -455,4 +421,62 @@ def mergeMinData(startdate,enddate,cycle,code):
 
 #xstr = 'xxxx_123123'
 #xstr =xstr.split('_')[1]
+    
+#获取code从starttime起的日数据
+def getStkCodeDayDate(code,startTime):
+    #readPath=os.path.join(dayDataPath,code+'.csv')
+    #selectDF=selectOneStkCode(code,datastyle,date,cycle)
+    selectDF,datastyle=initDatDateSelectFileWithCode(code,startTime)
+    readPath=tt.joinPath(tt.dayDataDir,code+'.csv')
+    if os.path.exists(readPath)==False:
+        getStkFromFile(select_stk_code,startTime)
+    else:
+        #tdf=pd.read_csv(readPath,encoding='gbk')
+        tdf=tt.readDf(readPath)
+        sd=tt.str2dateYmd(startTime)
+        ed=tt.today_Date
+        fd=tt.str2dateYmd(tdf.tail(1)['date'].values[0])
+        td=tt.str2dateYmd(tdf.head(1)['date'].values[0])
+        if abs((fd-sd)/tt.one_Day_Delta)>=3 or ed>td:
+            tt.remove(readPath)
+            fd,td=sd,ed
+            getStkFromFile(select_stk_code,startTime)
+    tdf=tt.readDf(readPath)
+    fromDate=tt.str2dateYmd(tdf.tail(1)['date'].values[0])+' '+tt.endTradeTime
+    toDate=tt.str2dateYmd(tdf.head(1)['date'].values[0])+' '+tt.endTradeTime
+    return readPath,tdf,fromDate,toDate,selectDF,datastyle
+def getStkCodeTodayTickData(code):
+    selectDF,datastyle=initRealTickSelectFileWithCode(code)
+    readPath=tt.realTickPath
+    readPath=tt.joinPath(readPath,code+'.csv')
+    getTodayTickAndCycle(tt.select_stk_code,selectDF.loc[0,'cycle'])
+    tdf=tt.readDf(readPath)
+    fromDate=tt.today_Date_Ymd_Str+' '+tdf.tail(1)['time'].values[0]
+    toDate=tt.today_Date_Ymd_Str+' '+tdf.head(1)['time'].values[0]
+    return readPath,tdf,fromDate,toDate,selectDF,datastyle
 
+def getStkCodeTodayMinData(code,cycle):
+    selectDF,datastyle=initRealTickToMinSelectFileWithCode(code,cycle)
+    readPath=tt.realTickPath
+    cycle='%02d' %cycle
+    readPath=tt.joinPath(readPath,'M'+cycle,code+'.csv')
+    getTodayTickAndCycle(tt.select_stk_code,selectDF.loc[0,'cycle'])
+    tdf=tt.readDf(readPath)
+    fromDate=tt.today_Date_Ymd_Str+' '+tdf.tail(1)['time'].values[0]
+    toDate=tt.today_Date_Ymd_Str+' '+tdf.head(1)['time'].values[0]
+    return readPath,tdf,fromDate,toDate,selectDF,datastyle
+
+def getStkCodeHisTickData(code,date):
+    selecDF,datastyle=initHisTickSelectFileWithCode(code,date)
+    readPath=tt.hisTickPath
+    dtime=tt.str2dateYmd(date)
+    ttime=dtime+tt.one_Day_Delta
+    Tdate=tt.dateYmd2str(ttime)
+    getYM=tt.dateYm2str(dtime)
+    readPath=tt.joinPath(readPath,getYM,date+'_'+code+'.csv')
+    if tt.isExist(readPath)==False:
+        getPastTick(tt.select_stk_code,date,Tdate)
+    tdf=tt.readDf(readPath)
+    fromDate=date+' '+tdf.tail(1)['time'].values[0]
+    toDate=Tdate+' '+tdf.head(1)['time'].values[0]
+    

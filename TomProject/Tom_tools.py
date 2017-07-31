@@ -3,19 +3,20 @@ import os ,sys
 import datetime as dt
 import pandas as pd
 
+def dateYm2str(date):
+    return dt.datetme.strftime(date,'%Y-%m')
+
 def dateYmd2str(date):
     return dt.datetime.strftime(date,'%Y-%m-%d')
+
+def dateYmdHMS2str(date):
+    return dt.datetime.strftime(date,'%Y-%m-%d %H:%M:%S')
     
 def str2dateYmd(dateStr):
     return dt.datetime.strptime(dateStr,'%Y-%m-%d')
 
-def dateYmdHMS2str(date):
-    return dt.datetime.strftime(date,'%Y-%m-%d %H:%M:%S')
-
 def str2dateYmdHMS(dateStr):
     return dt.datetime.strptime(dateStr,'%Y-%m-%d %H:%M:%S')
-
-
 
 one_Day_Delta=dt.timedelta(days=1)
 today_Date=dt.datetime.now()
@@ -34,9 +35,9 @@ def makeDirs(path):
         os.makedirs(path)
 def gotoProjectPath():
     #tomMobileTank  
-    #os.chdir('e:\\Users\\yjh19\\workspace\\TomQuant\\TomProject\\')
+    os.chdir('e:\\Users\\yjh19\\workspace\\TomQuant\\TomProject\\')
     #TomMacBookAir   
-    os.chdir('/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomProject/')
+    #os.chdir('/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomProject/')
     #TomMacPro
     #os.chdir('/Users/yejunhai/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomProject/')    
     #print('[+]ProjectPath : '+ os.getcwd())
