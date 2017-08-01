@@ -102,10 +102,11 @@ def initDatDateSelectFileWithCode(code,date):
 def initRealTickSelectFileWithCode(code):
     datastyle='realTick'
     if not tt.isExist(tt.select_stk_code):
-        selectOneStkCode(code,datastyle,tt.today_Date_Ymd_Str,'05')
+        selectOneStkCode(code,datastyle,tt.today_Date_Ymd_Str,'01')
     else:
         selectOtherCode(code)
         selectCodeOtherDatastyle(datastyle)
+        selectCodeOtherCycle('01')
     return getSelectList(), datastyle
 def initRealTickToMinSelectFileWithCode(code,cycle):
     datastyle='realTickToMin'
@@ -141,33 +142,35 @@ def initHisTickToMinSelectFileWithCode(code,date,cycle):
 def selectOneStkCode(code,datastyle,date,cycle):
     tt.remove(tt.select_stk_code)
     #df=pd.read_csv(tt.stk_code, encoding='gbk')
-    df=getSelectList()
+    df=tt.readDf(tt.stk_code)
     df=df[df['code'].isin([code])]
+    df=pd.concat([df],ignore_index=True)
     df['datastyle']=datastyle
     df['date']=date
     df['cycle']=cycle
     #df['hisCodeMinEndDate']=hisCodeMinEndDate
     tt.saveDf(tt.select_stk_code,df)
     #df.to_csv(select_stk_code,index=False,encoding='gbk',date_format='str');
-    return tt.readDf(tt.select_stk_code)
+    return getSelectList()
 def selectNextCodeInStkCode():
     df=tt.readDf(tt.stk_code)
     #sdf=tt.readDf(tt.select_stk_code)
     sdf=getSelectList()
     index=df[df['code']==sdf['code'][0]].index.values[0]
     index+=1
-    df0=df[df.index==index]
-    df0['datastyle']=sdf.loc[0,'datastyle']
-    df0['date']=sdf.loc[0,'date']
-    df0['cycle']=sdf.loc[0,'cycle']
-    df0=pd.concat([df0],ignore_index=True)
-    tt.saveDf(tt.select_stk_code,df0)
-    return df0
+    if index==df.index.size:
+        index=0
+    code=df.loc[index,'code']
+    datastyle=sdf.loc[0,'datastyle']
+    date=sdf.loc[0,'date']
+    cycle='%02d'%sdf.loc[0,'cycle']
+    return selectOneStkCode(code,datastyle,date,cycle)
 def selectOtherCode(code):
     df=getSelectList()
-    df['code']=code
-    tt.saveDf(tt.select_stk_code,df)
-    return df
+    datastyle=df.loc[0,'datastyle']
+    date=df.loc[0,'date']
+    cycle='%02d'%df.loc[0,'cycle']
+    return selectOneStkCode(code,datastyle,date,cycle)
 def selectCodeAddDate(xday):
     #df=pd.read_csv(select_stk_code,encoding='gbk')
     #df=tt.readDf(select_stk_code)
@@ -263,6 +266,7 @@ def removeStkFromFav(code):
             #os.remove(fav_stk_code)
             #tt.readDf(fav_stk_code)
             tt.remove(fav_stk_code)
+            return
         #df=pd.read_csv(fav_stk_code,encoding='gbk')
         df=tt.readDf(fav_stk_code)
         df0=df[df['code'].isin([code])]
@@ -381,12 +385,11 @@ def transToMinWithTickSourceDir(selectCodefile,tickSourceDir,outputMinDir,startd
                                     os.makedirs(outD)
                                 transfToMinWithTick(f,outD,cycles)
         sd+=delta
-    '''
     #转换完成以后才能合并所以不能合在一起
     for code in selectCodes:
         for cycle in cycles:
             mergeMinData(startdate,enddate,cycle,str(code))
-    '''
+    
 #批量下载才允许合并
 def mergeMinData(startdate,enddate,cycle,code):
     delta=dt.timedelta(days=1)
@@ -398,20 +401,22 @@ def mergeMinData(startdate,enddate,cycle,code):
     code='%06d' %int(code)
     print(code)
     while(sd<=ed):
-        datestr=dt.datetime.strftime(sd,'%Y-%m-%d')
+        datestr=dt.datetime.strftime(ed,'%Y-%m-%d')
+        
         hisMinFilePath=os.path.join(outputMinDir,datestr,cycle,code+'.csv')
         print(hisMinFilePath)
-        df0=pd.read_csv(hisMinFilePath, encoding='gbk')
-        for i in range(df0.index.size):
-            df0.at[i,'time']=datestr+' '+str(df0.loc[i,'time'])
-        if df.size<5:
-            df=df0
-        else:
-            df=pd.concat([df,df0],ignore_index=True)
-        sd+=delta
+        if tt.isExist(hisMinFilePath):
+            df0=pd.read_csv(hisMinFilePath, encoding='gbk')
+            for i in range(df0.index.size):
+                df0.at[i,'time']=datestr+''+str(df0.loc[i,'time'])
+            if df.size<5:
+                df=df0
+            else:
+                df=pd.concat([df,df0],ignore_index=True)
+        ed-=delta
     outputPath=os.path.join(hisCodeMinPath,cycle,code+'.csv')
     df.to_csv(outputPath, encoding='gbk')
-    
+    return df,outputPath
     
 
 #def mergeTwoTick
@@ -442,14 +447,16 @@ def getStkCodeDayDate(code,startTime):
             fd,td=sd,ed
             getStkFromFile(select_stk_code,startTime)
     tdf=tt.readDf(readPath)
-    fromDate=tt.str2dateYmd(tdf.tail(1)['date'].values[0])+' '+tt.endTradeTime
-    toDate=tt.str2dateYmd(tdf.head(1)['date'].values[0])+' '+tt.endTradeTime
+    fromDate=tdf.tail(1)['date'].values[0]+' '+tt.endTradeTime
+    toDate=tdf.head(1)['date'].values[0]+' '+tt.endTradeTime
     return readPath,tdf,fromDate,toDate,selectDF,datastyle
+
 def getStkCodeTodayTickData(code):
     selectDF,datastyle=initRealTickSelectFileWithCode(code)
     readPath=tt.realTickPath
     readPath=tt.joinPath(readPath,code+'.csv')
-    getTodayTickAndCycle(tt.select_stk_code,selectDF.loc[0,'cycle'])
+    cycleStr='%02d' %selectDF.loc[0,'cycle']
+    getTodayTickAndCycle(tt.select_stk_code,[cycleStr])
     tdf=tt.readDf(readPath)
     fromDate=tt.today_Date_Ymd_Str+' '+tdf.tail(1)['time'].values[0]
     toDate=tt.today_Date_Ymd_Str+' '+tdf.head(1)['time'].values[0]
@@ -458,9 +465,10 @@ def getStkCodeTodayTickData(code):
 def getStkCodeTodayMinData(code,cycle):
     selectDF,datastyle=initRealTickToMinSelectFileWithCode(code,cycle)
     readPath=tt.realTickPath
-    cycle='%02d' %cycle
+    cycle='%02d' %int(cycle)
     readPath=tt.joinPath(readPath,'M'+cycle,code+'.csv')
-    getTodayTickAndCycle(tt.select_stk_code,selectDF.loc[0,'cycle'])
+    cycleStr='%02d' %selectDF.loc[0,'cycle']
+    getTodayTickAndCycle(tt.select_stk_code,[cycleStr])
     tdf=tt.readDf(readPath)
     fromDate=tt.today_Date_Ymd_Str+' '+tdf.tail(1)['time'].values[0]
     toDate=tt.today_Date_Ymd_Str+' '+tdf.head(1)['time'].values[0]
@@ -470,13 +478,35 @@ def getStkCodeHisTickData(code,date):
     selecDF,datastyle=initHisTickSelectFileWithCode(code,date)
     readPath=tt.hisTickPath
     dtime=tt.str2dateYmd(date)
-    ttime=dtime+tt.one_Day_Delta
-    Tdate=tt.dateYmd2str(ttime)
+    #ttime=dtime+tt.one_Day_Delta
+    #Tdate=tt.dateYmd2str(ttime)
     getYM=tt.dateYm2str(dtime)
     readPath=tt.joinPath(readPath,getYM,date+'_'+code+'.csv')
-    if tt.isExist(readPath)==False:
-        getPastTick(tt.select_stk_code,date,Tdate)
-    tdf=tt.readDf(readPath)
-    fromDate=date+' '+tdf.tail(1)['time'].values[0]
-    toDate=Tdate+' '+tdf.head(1)['time'].values[0]
-    
+    if not tt.isExist(readPath):
+        getPastTick(tt.select_stk_code,date,date)
+    if tt.isExist(readPath):
+        tdf=tt.readDf(readPath)
+        fromDate=date+' '+tdf.tail(1)['time'].values[0]
+        toDate=date+' '+tdf.head(1)['time'].values[0]
+        return readPath,tdf,fromDate,toDate,selecDF,datastyle
+    else:
+        return
+def getStkCodeHisTickToMinData(code,date,cycle):
+    cycleStr='M'+'%02d'%int(cycle)
+    selecDF,datastyle=initHisTickToMinSelectFileWithCode(code,date,cycle)
+    readPath=tt.joinPath(tt.hisTickToMinPath,date,cycleStr,code+'.csv')
+    if not tt.isExist(readPath):
+        xReadPath,xtdf,xfromDate,xtoDate,xSelectDF,xDatastyle=getStkCodeHisTickData(code,date)
+        if xReadPath==None:
+            print('Can not find trans souce file')
+            return
+        if tt.isExist(xReadPath):
+            selecDF,datastyle=initHisTickToMinSelectFileWithCode(code,date,cycle)
+            transfToMinWithTick(xReadPath,tt.joinPath(tt.outputMinDir,date,[cycle]))
+    if tt.isExist(readPath):
+        tdf=tt.readDf(readPath)
+        fromDate=date+' '+tdf.tail(1)['time'].values[0]
+        toDate=date+' '+tdf.head(1)['time'].values[0]
+        return tdf,fromDate,toDate,selecDF,datastyle
+    else:
+        return

@@ -1,9 +1,11 @@
-# -*- coding: utf-8 -*-
+gi# -*- coding: utf-8 -*-
 #Editing by Tom
 import os,sys
 import Tom_AutoReadData as ta
 import Tom_Draw as tda
 import Tom_DownloadStkData as td
+
+import Tom_tools as tt
 #import Tom_Draw as tda
 import pandas as pd
 import numpy as np
@@ -24,9 +26,23 @@ rP,df,fromDate,toDate,selectDF,datastyle=ta.readStk(datastyle,date,cycle,startco
 #plotList=['P']
 #tomdraw(code,readPath,datastyle, fromDate, toDate, plotList)
 #获取数据
+datastyle='hisTickToMin'
+fromDate='2017-05-10'
+toDate='2017-07-31'
+rP='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/min/M01/600058.csv'
+df=tt.readDf(rP)
+fromDate=df.tail(1)['time'].values[0]
+toDate=df.head(1)['time'].values[0]
 tda.tomdraw(rP,datastyle,fromDate,toDate)
 print(rP,fromDate,toDate,selectDF,datastyle,df)
+td.removeStkFromFav('ALL')
+pd.read_csv(td.fav_stk_code,encoding='gbk')
+td.addStkCodesToFav(['600058'])
+td.getPastTick(td.fav_stk_code,'2017-07-21','2017-08-01')
+td.transToMinWithTickSourceDir(td.fav_stk_code,td.his_tick_sourceDir,td.outputMinDir,'2017-05-10','2017-07-31',['01'])
 
-#pd.read_csv(td.fav_stk_code,encoding='gbk')
-#td.getPastTick(td.fav_stk_code,'2017-05-02','2017-05-04')
-#td.transToMinWithTickSourceDir(td.fav_stk_code,td.his_tick_sourceDir,td.outputMinDir,'2017-05-02','2017-05-04',['01'])
+startdate='2017-05-10'
+enddate='2017-07-31'
+code='600058'
+cycle='01'
+td.mergeMinData(startdate,enddate,cycle,str(code))

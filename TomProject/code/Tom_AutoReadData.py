@@ -88,7 +88,7 @@ def readStk(datastyle,date,cycle,code):
         tdf=pd.read_csv(readPath, encoding='gbk')
         fromDate=dt.datetime.strftime(dt.datetime.now(),'%Y-%m-%d')+' '+tdf.tail(1)['time'].values[0]
         toDate=dt.datetime.strftime(dt.datetime.now(),'%Y-%m-%d')+' '+tdf.head(1)['time'].values[0]
-        '''
+        
     elif datastyle=='hisCodeMin':
         
         readPath=td.hisCodeMinPath
@@ -116,7 +116,7 @@ def readStk(datastyle,date,cycle,code):
         df=pd.read_csv(readPath,encoding='gbk')
         fromDate=df.loc[df.index.size-1,'time']
         toDate=df.loc[0,'time']
-        '''
+        
     else:
         print('No such type')
         return
@@ -184,3 +184,17 @@ def readOtherHisCodeMinEndDate(hisCodeMinEndDate):
     hisCodeMinEndDate=selectDF.loc[0,'hisCodeMinEndDate']
     return readStk(datastyle,date,cycle,code,hisCodeMinEndDate)
 '''
+
+def readStk2(datastyle,date,cycle,code):
+    if datastyle=='dayData':
+        return td.getStkCodeDayDate(code,date)
+    elif datastyle=='realTick':
+        return td.getStkCodeTodayTickData(code)
+    elif datastyle=='realTickToMin':
+        return td.getStkCodeTodayMinData(code,cycle)
+    elif datastyle=='hisTick':
+        return td.getStkCodeHisTickData(code,date)
+    elif datastyle=='hisTickToMin':
+        return td.getStkCodeHisTickToMinData(code,date,cycle)
+    
+readPath,tdf,fromDate,toDate,selecDF,datastyle=readStk('realTickToMin','2017-05-10','01','600058')
