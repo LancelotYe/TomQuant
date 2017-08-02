@@ -173,7 +173,7 @@ def xtick_down8tim_all(qx,finx):
     
     xtick_down_init(qx,finx)
     #qx.xday0ChkFlag=False
-    print('r',qx.rdat,qx.rtickTim);
+    #print('r',qx.rdat,qx.rtickTim);
     #    self.rtickTimMon=self.rtickTim+'2010-01\\';  #   \zwDat\ticktim\  2012-01\
     for tc in range(qx.xdayNum):
         qx.DTxtim=qx.DTxtim0+dt.timedelta(days=tc) 
@@ -508,7 +508,7 @@ def xtick_real_down_all(qx,finx,cycles):
         qx.min_ksgns=cycles
     #qx.min_ksgns=['05','15','30','60']
     rdat=zw._rdatTickReal;
-    rdat=os.path.join(rdat,'tick')
+    #rdat=os.path.join(rdat,'tick')
     if os.path.exists(rdat)==False:
         os.makedirs(rdat)
     dinx = pd.read_csv(finx,encoding='gbk');print('finx',finx);
@@ -531,7 +531,8 @@ def xtick_real_down_all(qx,finx,cycles):
                 #qx.rminWrk='%s\\%s\\'%(qx.rmin0k,qx.min_ksgnWrk);
                 qx.rminWrk=os.path.join(qx.rmin0k, qx.min_ksgnWrk)
                 if os.path.exists(qx.rminWrk)==False:
-                    os.makedirs(qx.rminWrk)
+                    #os.makedirs(qx.rminWrk)
+                    print('xx')
                 #
                 #sgnMin='M'+ksgn0;qx.minType=int(ksgn0);       # print('@mt',qx.minType)
                 qx.datMin[ksgn]=pd.DataFrame(columns=zw.qxMinName);        

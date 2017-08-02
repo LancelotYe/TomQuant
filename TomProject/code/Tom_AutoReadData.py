@@ -14,7 +14,7 @@ import datetime as dt
 datastyle=['dayData','hisTick','hisTickToMin','realTick','realTickToMin','hisCodeMin']
 '''
 #def readStk(datastyle,date,cycle,code,hisCodeMinEndDate):
-
+'''
 def readStk(datastyle,date,cycle,code):
     selectDF=td.selectOneStkCode(code,datastyle,date,cycle)
     fromDate=''
@@ -88,9 +88,8 @@ def readStk(datastyle,date,cycle,code):
         tdf=pd.read_csv(readPath, encoding='gbk')
         fromDate=dt.datetime.strftime(dt.datetime.now(),'%Y-%m-%d')+' '+tdf.tail(1)['time'].values[0]
         toDate=dt.datetime.strftime(dt.datetime.now(),'%Y-%m-%d')+' '+tdf.head(1)['time'].values[0]
-        
+       
     elif datastyle=='hisCodeMin':
-        
         readPath=td.hisCodeMinPath
         readPath=os.path.join(readPath,'M'+cycle,code+'.csv')
         if os.path.exists(readPath)==False:
@@ -116,7 +115,7 @@ def readStk(datastyle,date,cycle,code):
         df=pd.read_csv(readPath,encoding='gbk')
         fromDate=df.loc[df.index.size-1,'time']
         toDate=df.loc[0,'time']
-        
+      
     else:
         print('No such type')
         return
@@ -127,7 +126,7 @@ def readStk(datastyle,date,cycle,code):
     #print(fromDate)
     #print(toDate)
     return readPath,df,fromDate,toDate,selectDF, datastyle
-
+'''
 #rP,df,fromDate,toDate=readStk('hisTick','2015-02-25','01','000001')
 def readNextStk():
     selectDF=td.selectNextCodeInStkCode()
@@ -185,7 +184,7 @@ def readOtherHisCodeMinEndDate(hisCodeMinEndDate):
     return readStk(datastyle,date,cycle,code,hisCodeMinEndDate)
 '''
 
-def readStk2(datastyle,date,cycle,code):
+def readStk(datastyle,date,cycle,code):
     if datastyle=='dayData':
         return td.getStkCodeDayDate(code,date)
     elif datastyle=='realTick':
@@ -196,5 +195,11 @@ def readStk2(datastyle,date,cycle,code):
         return td.getStkCodeHisTickData(code,date)
     elif datastyle=='hisTickToMin':
         return td.getStkCodeHisTickToMinData(code,date,cycle)
-    
-readPath,tdf,fromDate,toDate,selecDF,datastyle=readStk('realTickToMin','2017-05-10','01','600058')
+'''
+readPath,tdf,fromDate,toDate,selecDF,datastyle=readStk('realTickToMin','2017-05-11','05','600111')
+print(readPath)
+print(tdf)
+print(fromDate,toDate)
+print(selecDF)
+print(datastyle)
+'''

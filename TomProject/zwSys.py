@@ -26,7 +26,7 @@ from matplotlib import pyplot as plt
 
 import zwTools as zwt
 import zwQTBox as zwx
-
+import Tom_tools as tt
 
 #----zw.var...
 __version__='2016.M5'
@@ -55,7 +55,7 @@ _rdatMin=_rdat0+"min/"
 _rdatTick=_rdat0+"tick/"
 _rdatTickReal=_rdat0+"tickreal/"
 '''
-
+'''
 def gotoProjectPath():
     #tomMobileTank  
     #os.chdir('e:\\Users\\yjh19\\workspace\\TomQuant\\TomProject\\')
@@ -82,15 +82,16 @@ def getBasePath():
         os.makedirs(rss)
     return rss
 
+'''
 
-
-_rdat0=getTomQuantDataPath()
+_rdat0=tt.getTomQuantDataPath()
 _rdatCN=os.path.join(_rdat0,'cn'+os.sep)
 _rdatUS=os.path.join(_rdat0,'us'+os.sep)
 _rdatInx=os.path.join(_rdat0,'inx'+os.sep)
 _rdatMin=os.path.join(_rdat0,'min'+os.sep)
 _rdatTick=os.path.join(_rdat0,'tick'+os.sep)
-_rdatTickReal=os.path.join(_rdat0, 'tickreal'+os.sep)
+#_rdatTickReal=os.path.join(_rdat0, 'tickreal'+os.sep)
+_rdatTickReal=tt.realTickPath
 #print(_rdatCN)
 _rdatZW=os.path.join(_rdat0,'zw'+os.sep)
 
@@ -411,7 +412,8 @@ class zwDatX(object):
         self.rdat=rs0;                  #   \zwDat\
         #self.rtickTim=rs0+'tick/'; 
         #self.rtickTimMon=self.rtickTim+'2010-01/'; 
-        self.rtickTim=os.path.join(rs0, 'tick')  #   \zwDat\ticktim\  2012-01\
+        #self.rtickTim=os.path.join(rs0, 'tick')  #   \zwDat\ticktim\  2012-01\
+        self.rtickTim=os.path.join(rs0)  #   \zwDat\ticktim\  2012-01\
         self.rtickTimMon=os.path.join(self.rtickTim, '2010-01');  #   \zwDat\ticktim\  2012-01\
         # xxx.lib
         self.stkCodeLib=[]
