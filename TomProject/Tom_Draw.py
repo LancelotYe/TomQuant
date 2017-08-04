@@ -104,9 +104,11 @@ def drawCandlestick(w,rect, qs, XLabelVisable):
     ax_K = fig.add_axes(rect)
     candlestick_ochl(ax_K, qs, width = w, colorup='deeppink', colordown='c')
     ax_K.xaxis_date()
+    
     plt.setp(ax_K.get_xticklabels(), rotation= 30, horizontalalignment='right')
     plt.setp(ax_K.get_xticklabels(), visible=XLabelVisable) 
-   
+    plt.xticks(pd.date_range('2017-03-16 09:36:00','2017-03-16 12:00:00'),rotation=90)
+    #fig.autofmt_xdate()
     
 def drawVolumns(rect, qs, XLabelVisable):
     dates = [q[0] for q in qs]
@@ -123,10 +125,12 @@ def drawTickPrices(rect, qs):
     dates = [q[0] for q in qs]
     prices = [q[1] for q in qs]
     fig = plt.figure()
+    
     ax_vol = fig.add_axes(rect)
     plt.setp(ax_vol.get_xticklabels(), rotation= 30, horizontalalignment='right')
     plt.plot(dates,prices,'#f2c200',label='price',linewidth=1.0)
     ax_vol.xaxis.set_major_formatter(mdate.DateFormatter('%H:%M'))
+    
     #ax_vol.xaxis_date()
     #plt.xticks(dates)
     plt.grid()
@@ -184,10 +188,10 @@ def getDataFromCSVWithDataStyle(datastyle,filePath, fromDate, toDate):
             floatday = date2num(datetimeDay)
             if i==0:
                 floatDayOne=floatday
-                #print(floatDayOne)
-            elif i==(quotes.index.size-1):
+                print(floatDayOne)
+            elif i==(quotes.index.size-2):
                 floatDayEnd=floatday
-                #print(floatDayEnd)
+                print(floatDayEnd)
                 
             _o = float(df['open'])
             _c = float(df['close'])

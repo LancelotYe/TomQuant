@@ -16,9 +16,10 @@ import tushare as ts
 startcode='000010'
 cycle='05'
 date='2017-03-16'
-datastyle='hisCodeMin'
+datastyle='dayData'
 #hisCodeMinEndDate='2017-03-17'
-#rP,df,fromDate,toDate,selectDF,datastyle=ta.readStk(datastyle,date,cycle,startcode)
+rP,df,fromDate,toDate,selectDF,datastyle=ta.readStk(datastyle,date,cycle,startcode)
+tda.tomdraw(rP,datastyle,fromDate,toDate)
 #rP,df,fromDate,toDate,selectDF=ta.readNextStk()
 #rP,df,fromDate,toDate,selectDF=ta.readAfterXDay(2)
 #rP,df,fromDate,toDate,selectDF,datastyle=ta.readNextDatastyleStk()
@@ -42,7 +43,7 @@ pd.read_csv(td.fav_stk_code,encoding='gbk')
 '''
 #td.addStkCodesToFav(['600058'])
 #td.getPastTick(tt.fav_stk_code,'2017-07-21','2017-07-24')
-td.transToMinWithTickSourceDir(tt.fav_stk_code,tt.his_tick_sourceDir,tt.outputMinDir,'2017-07-21','2017-07-24',['01'])
+#td.transToMinWithTickSourceDir(tt.fav_stk_code,tt.his_tick_sourceDir,tt.outputMinDir,'2017-07-21','2017-07-24',['01'])
 
 '''
 startdate='2017-05-10'
