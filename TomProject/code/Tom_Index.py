@@ -16,7 +16,7 @@ import tushare as ts
 startcode='000010'
 cycle='05'
 date='2017-03-16'
-datastyle='dayData'
+datastyle='hisTickToMin'
 #hisCodeMinEndDate='2017-03-17'
 rP,df,fromDate,toDate,selectDF,datastyle=ta.readStk(datastyle,date,cycle,startcode)
 tda.tomdraw(rP,datastyle,fromDate,toDate)
