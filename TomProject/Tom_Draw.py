@@ -167,7 +167,7 @@ def tomdraw(readPath,datastyle):
     r=mlab.csv2rec(readPath)
     r.sort()
     N=len(r)
-    def format_date(x,pos=None):
+    def format_date(x,pos=None):    
         thisind=np.clip(int(x+0.5),0,N-1)
         #return r.date[thisind].strftime('%Y-%m-%d')
         if datastyle=='dayData':
