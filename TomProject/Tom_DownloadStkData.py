@@ -267,7 +267,7 @@ def mergeMinData(startDate,endDate,cycle,code):
         datestr=dt.datetime.strftime(ed,'%Y-%m-%d')
         hisMinFilePath=os.path.join(tt.outputMinDir,datestr,cycle,code+'.csv')
         if tt.isExist(hisMinFilePath):
-            print(hisMinFilePath)
+            #print(hisMinFilePath)
             df0=pd.read_csv(hisMinFilePath, encoding='gbk')
             for i in range(df0.index.size):
                 df0.at[i,'time']=datestr+''+str(df0.loc[i,'time'])
@@ -281,8 +281,10 @@ def mergeMinData(startDate,endDate,cycle,code):
         return
     #outputPath=os.path.join(tt.hisCodeMinPath,cycle,code+'.csv')
     outputDir=tt.joinPath(tt.hisCodeMinPath,cycle)
-    tt.saveFileToDir(startDate+'_'+endDate+'_'+code+'.csv',outputDir,df)
-    return df
+    readPath=tt.joinPath(outputDir,startDate+'-'+endDate+'-'+code+'.csv')
+    #tt.saveFileToDir(startDate+'-'+endDate+'-'+code+'.csv',outputDir,df)
+    tt.saveDFNoIndex(readPath,df)
+    return df,readPath
     
 
 #在操作该方法之前先添加收藏的股票代码到收藏文件
@@ -292,6 +294,10 @@ def downAndMergeFavCodeMinData(startDate,endDate,cycles):
      #转换完成以后才能合并所以不能合在一起
     sdf=tt.getFavList()
     selectCodes=sdf['code']
+    readPaths=list()
     for code in selectCodes:
         for cycle in cycles:
-            mergeMinData(startDate,endDate,cycle,str(code))
+            df,readPath=mergeMinData(startDate,endDate,cycle,str(code))
+            print(readPath)
+            readPaths.append(readPath)
+    return readPaths
