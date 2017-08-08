@@ -186,7 +186,8 @@ def tomdraw(readPath,datastyle):
     #rect_amount=[left,1.6,width,amount_h]
     #rect_tick=[left,1.6,width,tick_h]
     def getMainH(dif):
-        return 0.15*dif+0.2
+        x=0.15*dif+0.2
+        return x if x<2.0 else 2.0
     fig=plt.figure()
     if datastyle=='dayData' or datastyle=='hisTickToMin' or datastyle=='realTickToMin' or datastyle=='hisTickToMinMerge':
         quote, dif= installMinData(r)

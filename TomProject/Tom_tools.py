@@ -35,9 +35,11 @@ def makeDirs(path):
         os.makedirs(path)
 def gotoProjectPath():
     #tomMobileTank  
-    os.chdir('e:\\Users\\yjh19\\workspace\\TomQuant\\TomProject\\')
+    #os.chdir('e:\\Users\\yjh19\\workspace\\TomQuant\\TomProject\\')
+    #TomMacPro
+    #os.chdir('/Users/yejunhai/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomProject')
     #TomMacBookAir   
-    #os.chdir('/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomProject/')
+    os.chdir('/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomProject/')
     #TomMacPro
     #os.chdir('/Users/yejunhai/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomProject/')    
     #print('[+]ProjectPath : '+ os.getcwd())
@@ -262,6 +264,7 @@ def getSelectList():
 def addStkCodesToFav(codeList):
     df=readDf(stk_code)
     df=df[df['code'].isin(codeList)]
+    
     if df.size>1:
         if isExist(fav_stk_code):
             df0=readDf(fav_stk_code)

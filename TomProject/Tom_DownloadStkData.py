@@ -192,13 +192,25 @@ def getStkCodeHisTickData(code,date):
     readPath=tt.joinPath(readPath,getYM,date+'_'+code+'.csv')
     if not tt.isExist(readPath):
         getPastTick(tt.select_stk_code,date,date)
+    '''
     if tt.isExist(readPath):
         tdf=tt.readDf(readPath)
         fromDate=date+' '+tdf.tail(1)['time'].values[0]
         toDate=date+' '+tdf.head(1)['time'].values[0]
         return readPath,tdf,fromDate,toDate,selecDF,datastyle
     else:
-        return
+        print('No data')
+        pass
+    '''
+    try:
+        tdf=tt.readDf(readPath)
+        fromDate=date+' '+tdf.tail(1)['time'].values[0]
+        toDate=date+' '+tdf.head(1)['time'].values[0]
+        return readPath,tdf,fromDate,toDate,selecDF,datastyle
+    except Exception as e:
+        os._exit(2011) 
+        #os.exit(123)
+    
 def getStkCodeHisTickToMinData(code,date,cycle):
     cycleStr='M'+'%02d'%int(cycle)
     selecDF,datastyle=tt.initHisTickToMinSelectFileWithCode(code,date,cycle)
@@ -217,7 +229,8 @@ def getStkCodeHisTickToMinData(code,date,cycle):
         toDate=date+' '+tdf.head(1)['time'].values[0]
         return readPath,tdf,fromDate,toDate,selecDF,datastyle
     else:
-        return
+        os._exit(2011) 
+        #os.exit(123)
     
     
     
@@ -290,7 +303,7 @@ def mergeMinData(startDate,endDate,cycle,code):
 #在操作该方法之前先添加收藏的股票代码到收藏文件
 def downAndMergeFavCodeMinData(startDate,endDate,cycles):
     getPastTick(tt.fav_stk_code,startDate,endDate)
-    transToMinWithTickSourceDir(tt.fav_stk_code,tt.tickSourceDir,tt.outputMinDir,startDate,endDate,cycles)
+    transToMinWithTickSourceDir(tt.fav_stk_code,tt.his_tick_sourceDir,tt.outputMinDir,startDate,endDate,cycles)
      #转换完成以后才能合并所以不能合在一起
     sdf=tt.getFavList()
     selectCodes=sdf['code']

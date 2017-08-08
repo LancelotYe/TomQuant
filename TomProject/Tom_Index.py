@@ -13,15 +13,14 @@ import tushare as ts
 
 #td.addStkCodesToFav(['600259','600549'])
 #td.removeStkFromFav('ALL')
-startcode='000010'
+startcode='603859'
 cycle='05'
-date='2017-07-24'
+date='2017-03-15'
 datastyle='dayData'
-#hisCodeMinEndDate=''2017-07-24''
-
+#hisCodeMinEndDate='2017-03-17'
 rP,df,fromDate,toDate,selectDF,datastyle=ta.readStk(datastyle,date,cycle,startcode)
-tda.tomdraw (rP,datastyle)
-
+tda.tomdraw(rP,datastyle)
+#,fromDate,toDate)
 #rP,df,fromDate,toDate,selectDF=ta.readNextStk()
 #rP,df,fromDate,toDate,selectDF=ta.readAfterXDay(2)
 #rP,df,fromDate,toDate,selectDF,datastyle=ta.readNextDatastyleStk()
@@ -41,17 +40,11 @@ toDate=df.head(1)['time'].values[0]
 tda.tomdraw(rP,datastyle,fromDate,toDate)
 print(rP,fromDate,toDate,selectDF,datastyle,df)
 td.removeStkFromFav('ALL')
-pd.read_csv(tt.fav_stk_code,encoding='gbk')
+pd.read_csv(td.fav_stk_code,encoding='gbk')
 '''
-#tt.addStkCodesToFav(['600058'])
+#td.addStkCodesToFav(['600058'])
 #td.getPastTick(tt.fav_stk_code,'2017-07-21','2017-07-24')
 #td.transToMinWithTickSourceDir(tt.fav_stk_code,tt.his_tick_sourceDir,tt.outputMinDir,'2017-07-21','2017-07-24',['01'])
-rps=td.downAndMergeFavCodeMinData('2017-07-21','2017-07-24',['01'])
-#tt.readDf('e:\\Users\\yjh19\\workspace\\TomQuant\\TomQuantData\\cn\\hisTickToMinMerge\\M01\\2017-07-21-2017-07-24-600058.csv')
-for rp in rps:
-    df=tt.readDf(rp)
-    tda.tomdraw(rp,'hisTickToMinMerge')
-    #print(df)
 
 '''
 startdate='2017-05-10'
