@@ -4,7 +4,7 @@ import os,sys
 import Tom_AutoReadData as ta
 import Tom_Draw as tda
 import Tom_DownloadStkData as td
-
+import Tom_Strategy as tst
 import Tom_tools as tt
 #import Tom_Draw as tda
 import pandas as pd
@@ -19,6 +19,7 @@ date='2017-03-15'
 datastyle='dayData'
 #hisCodeMinEndDate='2017-03-17'
 rP,df,fromDate,toDate,selectDF,datastyle=ta.readStk(datastyle,date,cycle,startcode)
+tst.initMeanData(20,rP)
 tda.tomdraw(rP,datastyle)
 #,fromDate,toDate)
 #rP,df,fromDate,toDate,selectDF=ta.readNextStk()
