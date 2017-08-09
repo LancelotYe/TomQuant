@@ -2,6 +2,7 @@
 import pandas as pd
 import Tom_tools as tt
 import math
+'''
 rP='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/cn/day/603859.csv'
 df=tt.readDf(rP)
 df0=df.loc[0,'close']
@@ -12,21 +13,25 @@ closes=df.close
 
 closes
 x=getMean(closes)
-
-def getXdayMeanPrice(x,df):
+'''
+def getXdayMeanPrice(x,df,target):
     num=x
     numStr=str(num)
-    while(x<=df.index.size):
-        closes=[df.loc[i,'close'] for i in range(x)[-num:]]
-        df.at[x-1,'mean'+numStr]=getMean(closes)
+    #df=df.drop('mean5',axis=1)
+    size=df.index.size
+    while x<=size:
+        df.at[size-x,'mean'+numStr]=getMean([df.loc[i,target] for i in range(size-x+num)[-num:]])
         x+=1
     return df
 
 #df0=getXdayMeanPrice(5,df)
-    
-def initMeanData(x,rP):
+def deleteMeanData(x,rP):
     df=tt.readDf(rP)
-    df=getXdayMeanPrice(x,df)
+    df=df.drop('mean'+str(x),axis=1)
+    tt.saveDFNoIndex(rP,df)
+def initMeanData(x,rP,target):
+    df=tt.readDf(rP)
+    df=getXdayMeanPrice(x,df,target)
     tt.saveDFNoIndex(rP,df)
     
 def getStandardDeviation(prices):

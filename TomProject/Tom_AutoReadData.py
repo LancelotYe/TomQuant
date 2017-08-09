@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os,sys
 import Tom_DownloadStkData as td
-import Tom_Draw as tda
+#import Tom_Draw as tda
 import pandas as pd
 import numpy as np
 import datetime as dt

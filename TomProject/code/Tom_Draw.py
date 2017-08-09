@@ -12,13 +12,12 @@ import matplotlib.dates as mdate
 import matplotlib.ticker as ticker
 from matplotlib.finance import quotes_historical_yahoo_ohlc, candlestick_ochl
 from matplotlib.dates import date2num
-
 import Tom_tools as tt
 
 drawing_board_x,drawing_board_y,drawing_board_w=0,0,2
 drawing_board_fig=plt.figure()
 drawing_board_data=pd.DataFrame()
-AX_K
+AX_K=drawing_board_fig.
 AX_P
 AX_V
 drawing_board_datastyle=''
@@ -46,7 +45,6 @@ def drawing_format_date(x,pos=None):
         return drawing_board_data.time[thisind].strftime('%Y-%m-%d %H:%M:%S')
     return drawing_board_data.time[thisind].strftime('%H:%M:%S')
 def tomdrawK(readPath,datastyle):
-    
     global drawing_board_datastyle
     global drawing_board_data
     global drawing_board_fig

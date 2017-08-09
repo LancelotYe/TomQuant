@@ -269,15 +269,17 @@ def transToMinWithTickSourceDir(baseCodefile,tickSourceDir,outputMinDir,startDat
    
 #批量下载才允许合并
 def mergeMinData(startDate,endDate,cycle,code):
-    delta=dt.timedelta(days=1)
-    sd=dt.datetime.strptime(startDate,'%Y-%m-%d')
-    ed=dt.datetime.strptime(endDate,'%Y-%m-%d')
+    #sd=dt.datetime.strptime(startDate,'%Y-%m-%d')
+    sd=tt.str2dateYmd(startDate)
+    #ed=dt.datetime.strptime(endDate,'%Y-%m-%d')
+    ed=tt.str2dateYmd(endDate)
     df=pd.DataFrame()
     #cycle=1
     cycle='M'+'%02d' %int(cycle)
     code='%06d' %int(code)
     while(sd<=ed):
-        datestr=dt.datetime.strftime(ed,'%Y-%m-%d')
+        #datestr=dt.datetime.strftime(ed,'%Y-%m-%d')
+        datestr=tt.dateYmd2str(ed)
         hisMinFilePath=os.path.join(tt.outputMinDir,datestr,cycle,code+'.csv')
         if tt.isExist(hisMinFilePath):
             #print(hisMinFilePath)
@@ -288,7 +290,7 @@ def mergeMinData(startDate,endDate,cycle,code):
                 df=df0
             else:
                 df=pd.concat([df,df0],ignore_index=True)
-        ed-=delta
+        ed-=tt.one_Day_Delta
     if df.size==0:
         print('No Data')
         return
