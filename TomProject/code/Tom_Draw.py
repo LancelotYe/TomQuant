@@ -17,7 +17,7 @@ import Tom_tools as tt
 drawing_board_x,drawing_board_y,drawing_board_w=0,0,2
 drawing_board_fig=plt.figure()
 drawing_board_data=pd.DataFrame()
-AX_K=drawing_board_fig.
+
 AX_P
 AX_V
 drawing_board_datastyle=''
@@ -138,6 +138,8 @@ def drawK(fig,rect,quote,width,func):
     ax_K.xaxis.set_major_formatter(ticker.FuncFormatter(func))
     plt.setp(ax_K.get_xticklabels(),rotation=0,horizontalalignment='right')
     plt.grid(True,which='minor',axis='y')
+    
+    
              #,visible=True)
     #ylim([6.9,7.1])
     #xlim([0,1])

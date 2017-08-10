@@ -29,6 +29,7 @@ rect_V=[]
 rect_A=[]
 rect_P=[]
 rect_M=[]
+rect_Ac=[]
 db_cols = ['blue', 'green', 'red', 'cyan',  'magenta', 'yellow', 'black', 'white']
 db_datastyle=''
 def initRect(h,style):
@@ -38,6 +39,7 @@ def initRect(h,style):
     global rect_A
     global rect_M
     global rect_P
+    global rect_Ac
     if style=='K':
         if len(rect_K)==0:
             rect_K=rect_M=[db_x,db_y,db_w,h]
@@ -55,6 +57,10 @@ def initRect(h,style):
         if len(rect_P)==0:
             rect_P=rect_M=[db_x,db_y,db_w,h]
             db_y+=(h+0.1)
+    elif style=='Ac':
+        if len(rect_Ac)==0:
+            rect_Ac=[db_x,db_y,db_w,h]
+            db_y+=(h+0.1)
 
 def format_date(x,pos=None):
     global db_r
@@ -69,7 +75,9 @@ def format_date(x,pos=None):
 
 def getK_H(dif):
     x=0.15*dif+0.2
-    return x if x<2.0 else 2.0
+    x= x if x<2.0 else 2.0
+    print(x)
+    return x
 
 def install_K_Data(r):
     quote=np.array([])
@@ -121,18 +129,21 @@ def install_M_Data(r,xday):
     for t in r:
         ind=r.searchsorted(t)
         mean='mean'+str(xday)
+        alc='accelerated'
         _m=t[mean]
-        qs=np.array([ind,_m])
+        _a=t[alc]
+        qs=np.array([ind,_m,_a])
         if quote.size==0:
             quote=qs
         else:
             quote=np.vstack((quote,qs))
     return quote
+        
 def draw_K(fig,rect,quote,width,func):
     ax_K=fig.add_axes(rect)
     candlestick_ochl(ax_K,quote,width=width,colorup='deeppink',colordown='c')
     ax_K.xaxis.set_major_formatter(ticker.FuncFormatter(func))
-    plt.setp(ax_K.get_xticklabels(),rotation=0,horizontalalignment='right')
+    plt.setp(ax_K.get_xticklabels(),rotation=30,horizontalalignment='right')
     plt.grid(True,which='minor',axis='y')
 def drawLine(fig,rect,ys,func,ls,color,label):
     ax=fig.add_axes(rect)
@@ -159,6 +170,7 @@ def tomdraw_K(rP):
     k_h=getK_H(dif)
     initRect(k_h,'K')
     draw_K(db_fig,rect_K,quote,0.5,format_date)
+    
 
 def tomdraw_VA(rP):
     global db_r
@@ -185,33 +197,83 @@ def tomdraw_P(rP):
     initRect(1.2,'P')
     drawLine(db_fig,rect_P,prices,format_date,'--','g','price')
     
-def tomdraw_M(rP,xday,ls,colornum):
+def tomdraw_M_Ac(rP,xdata,ls,colornum):
     if len(rect_K)>0:
         target='close'
     if len(rect_P)>0:
         target='price'
-    tst.initMeanData(xday,rP,target)
+    tst.initMeanAndAcceleratedData(xdata,rP,target)
     global db_r
     global rect_M
+    global rect_Ac
     global db_fig
     global db_cols
     color=db_cols[colornum]
     db_r=mlab.csv2rec(rP)
     #print(db_r)
     db_r.sort()
-    quote=install_M_Data(db_r,xday)
+    quote=install_M_Data(db_r,xdata)
     means=[q[1] for q in quote]
-    drawLine(db_fig,rect_M,means,format_date,ls,color,str(xday)+'mean')
-    tst.deleteMeanData(xday,rP)
+    drawLine(db_fig,rect_M,means,format_date,ls,color,str(xdata)+'mean')
+    initRect(1.2,'Ac')
+    acs=[q[2] for q in quote]
+    drawLine(db_fig,rect_Ac,acs,format_date,ls,color,'acs'+str(xdata))
+    tst.deleteMeanData(xdata,rP)
+    
+    
+def install_XD_data(r):
+    quote=np.array([])
+    for t in db_r:
+        if(t.xdl==4 or t.xdh==3):
+            ind=db_r.searchsorted(t)
+            close=t.close
+            qs=np.array([ind,close])
+            if quote.size==0:
+                quote=qs
+            else:
+                quote=np.vstack((quote,qs))
+    return quote
+
+def tomdraw_XD(rP_XD):
+    global db_r
+    db_r=mlab.csv2rec(rP_XD)
+    db_r.sort()
+    quote=install_XD_data(db_r)
+    #initRect(1.2,'K')
+    xs=[q[0] for q in quote]
+    ys=[q[1] for q in quote]
+    global rect_K
+    global db_fig
+    ax=db_fig.add_axes(rect_K)
+    plt.setp(ax.get_xticklabels(),rotation=30,horizontalalignment='right')
+    #,visible=True)
+    plt.plot(xs,ys,'r',label='XD',linewidth=1.5,ls='--')
+    plt.legend(loc='upper right')
+    #ax_vol.fill_between(index,volumes,color='coral')
+    ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_date))
+
+
+'''    
+rP_XD='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/tmp/600058.csv'
+db_datastyle='hisTickToMinMerge'
+
+
+tomdraw_K(rP_XD)
+
+tomdraw_XD(rP_XD)
+
 '''
-tomdraw_K(rP)
+'''
 #tst.deleteMeanData(2,rP)
-tomdraw_M(rP,5,'--',1)
-tomdraw_M(rP,10,'-.',2)
-tomdraw_M(rP,20,'-.',3)
-tomdraw_M(rP,30,'--',4)
+tomdraw_M(rP_XD,5,'--',1)
+tomdraw_M(rP_XD,10,'-.',2)
+tomdraw_M(rP_XD,20,'-.',3)
+tomdraw_M(rP_XD,30,'--',4)
 tomdraw_VA(rP)
 #tomdraw_P(rP)
+
+
+
 
 '''
 def tomdraw(rP,datastyle,means):
@@ -220,12 +282,12 @@ def tomdraw(rP,datastyle,means):
     if datastyle=='dayData' or datastyle=='hisTickToMin' or datastyle=='realTickToMin':
         tomdraw_K(rP)
         for mean in means:
-            tomdraw_M(rP,mean,'--',means.index(mean))
+            tomdraw_M_Ac(rP,mean,'--',means.index(mean))
         tomdraw_VA(rP)
     elif datastyle=='hisTick' or datastyle=='realTick':
         tomdraw_P(rP)
         for mean in means:
-            tomdraw_M(rP,mean,'--',means.index(mean))
+            tomdraw_M_Ac(rP,mean,'--',means.index(mean))
         tomdraw_VA(rP)
 
 
