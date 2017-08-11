@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import Tom_tools as tt
 import math
+
 '''
 rP='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/cn/day/603859.csv'
 df=tt.readDf(rP)
@@ -29,7 +30,7 @@ def getXdayMeanPrice(x,df,target):
 def deleteMeanData(x,rP):
     df=tt.readDf(rP)
     df=df.drop('mean'+str(x),axis=1)
-    df=df.drop('accelerated',axis=1)
+    df=df.drop('accelerated'+str(x),axis=1)
     tt.saveDFNoIndex(rP,df)
 def initMeanAndAcceleratedData(x,rP,target):
     df=tt.readDf(rP)
@@ -53,18 +54,13 @@ def bollChannel(prices):
 
 def getMeanAcceleratedSpeed(x,df):
     for i in range(df.index.size-1):
-        df.at[i,'accelerated']=df.loc[i,'mean'+str(x)]-df.loc[i+1,'mean'+str(x)]
+        df.at[i,'accelerated'+str(x)]=df.loc[i,'mean'+str(x)]-df.loc[i+1,'mean'+str(x)]
     return df
-'''
-rP='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/cn/day/603859.csv'
-df=tt.readDf(rP)
-x=5
-df0=getXdayMeanPrice(x,df,'close')
-df0=getMeanAcceleratedSpeed(x,df0)
 
-from matplotlib import pyplot as plt
-ys=df0.accelerated
 
-plt.plot(ys)
-plt.show
-'''
+
+
+
+
+
+

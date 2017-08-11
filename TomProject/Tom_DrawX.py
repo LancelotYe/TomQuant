@@ -124,12 +124,12 @@ def install_P_Data(r):
             quote=np.vstack((quote,qs))
     return quote
 
-def install_M_Data(r,xday):
+def install_M_Data(r,xdata):
     quote=np.array([])
     for t in r:
         ind=r.searchsorted(t)
-        mean='mean'+str(xday)
-        alc='accelerated'
+        mean='mean'+str(xdata)
+        alc='accelerated'+str(xdata)
         _m=t[mean]
         _a=t[alc]
         qs=np.array([ind,_m,_a])
@@ -253,6 +253,27 @@ def tomdraw_XD(rP_XD):
     ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_date))
 
 
+def tomdraw(rP,datastyle,means):
+    global db_datastyle
+    db_datastyle=datastyle
+    if datastyle=='dayData' or datastyle=='hisTickToMin' or datastyle=='realTickToMin':
+        tomdraw_K(rP)
+        for mean in means:
+            tomdraw_M_Ac(rP,mean,'--',means.index(mean))
+        tomdraw_VA(rP)
+    elif datastyle=='hisTick' or datastyle=='realTick':
+        tomdraw_P(rP)
+        for mean in means:
+            tomdraw_M_Ac(rP,mean,'--',means.index(mean))
+        tomdraw_VA(rP)
+
+
+
+
+
+
+
+
 '''    
 rP_XD='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/tmp/600058.csv'
 db_datastyle='hisTickToMinMerge'
@@ -273,26 +294,6 @@ tomdraw_VA(rP)
 #tomdraw_P(rP)
 
 
-
-
-'''
-def tomdraw(rP,datastyle,means):
-    global db_datastyle
-    db_datastyle=datastyle
-    if datastyle=='dayData' or datastyle=='hisTickToMin' or datastyle=='realTickToMin':
-        tomdraw_K(rP)
-        for mean in means:
-            tomdraw_M_Ac(rP,mean,'--',means.index(mean))
-        tomdraw_VA(rP)
-    elif datastyle=='hisTick' or datastyle=='realTick':
-        tomdraw_P(rP)
-        for mean in means:
-            tomdraw_M_Ac(rP,mean,'--',means.index(mean))
-        tomdraw_VA(rP)
-
-
-
-'''
 tst.initMeanData(10,rP)
 
 N=len(r)
