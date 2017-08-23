@@ -13,38 +13,23 @@ import tushare as ts
 
 #td.addStkCodesToFav(['600259','600549'])
 #td.removeStkFromFav('ALL')
-'''
-test1
-startcode='000001'
+
+#test1
+startcode='603859'
 cycle='01'
 date='2017-03-15'
-datastyle='dayData'
+datastyle='hisTickToMin'
 #hisCodeMinEndDate='2017-03-17'
 rP,df,fromDate,toDate,selectDF,datastyle=ta.readStk(datastyle,date,cycle,startcode)
 
-#tst.initMeanData(20,rP)
-tda.tomdraw(rP,datastyle,[5,10,30])
-'''
 
-
-rP='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/cn/day/603859.csv'
 x=5
 x2=15
 x3=30
 
-
-datastyle='dayData'
-'''
-initMeanAndAcceleratedData(x,rP,'close')
-initMeanAndAcceleratedData(x2,rP,'close')
-df=tt.readDf(rP)
-
-deleteMeanData(x,rP)
-deleteMeanData(x2,rP)
-'''
 tda.tomdraw(rP,datastyle,[x,x2,x3])
 
-
+df=tt.readDf(rP)
 
 
 

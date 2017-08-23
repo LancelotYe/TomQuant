@@ -197,6 +197,9 @@ def tomdraw_P(rP):
     initRect(1.2,'P')
     drawLine(db_fig,rect_P,prices,format_date,'--','g','price')
     
+'''
+画均线和均线加速度
+'''
 def tomdraw_M_Ac(rP,xdata,ls,colornum):
     if len(rect_K)>0:
         target='close'
