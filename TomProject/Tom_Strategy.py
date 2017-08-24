@@ -113,72 +113,191 @@ def ifLowerThanLast(index, array):
     else:
         return False
     
+'''
 array = [1,1,3,3,3,3,2,6,1,7,3,2,4,9,3,3,6,4,2,5,7,4,3,6,7,5]
 getTopIndex(array)
 getBottomIndex(array)
 
 hIndex=getTopIndex(high)
 lIndex=getBottomIndex(low)
-
+'''
 '''
 step2
 合并hl索引
 '''
-def connectHIndexAndLIndex(hIndex, lIndex):
+#def connectHIndexAndLIndex(hIndex, lIndex):
 
     
 '''
 初始化起始值
 '''
-hIndex, lIndex, high, low
-def getFirstIndex():
-    global hIndex,lIndex,high,low
-    high==df.high
-    low=df.low
-    hIndex=getTopIndex(high)
-    lIndex=getBottomIndex(low)
-    i=len(hIndex)
-    j=len(lIndex)
-    x = max(i,j)
-    for i in range(x):
-        if hIndex[i]==lIndex[i]:
-            continue
-        elif hIndex[i]>lIndex[i]:
+hIndexs=list()
+lIndexs=list() 
+highs=list() 
+lows=list()
+
+def getFirstIndex(df):
+    global hIndexs,lIndexs,highs,lows
+    highs=df.high
+    lows=df.low
+    hIndexs=getTopIndex(highs)
+    lIndexs=getBottomIndex(lows)
+    #i=len(hIndexs)
+    #j=len(lIndexs)
+    #x = max(i,j)
+    i=0
+    while hIndexs[i]==lIndexs[i]:
+        i+=1
+    if hIndexs[i]>lIndexs[i]:
             return 'l',i
-        elif lIndex[i]>hIndex[i]:
+    elif lIndexs[i]>hIndexs[i]:
             return 'h',i
         
-hl, index = getFirstIndex()
 
-def getNextIndex(hl,index):
-    global hIndex,lIndex,high,low
-    if hl == 'h':
-        x=0
-        while lIndex[x]>=index+4:
-            x+=1
-        for i in range(x)[-(x-index):]:
-            if high[index] < high[i]:
-                return 'h',i
-            elif low[x]>low[i]:
-                return getNextIndex('h', i)
-            return 'l', x
-    elif hl == 'l':
-        x=0
-        while lIndex[x]>=index+4:
-            x+=1
-        for i in range(x)[-(x-index):]:
-            if low[index] > low[i]:
-                return 'l',i
-            elif high[x]<high[i]:
-                return getNextIndex('l', i)
-            return 'h', x
-        
+
+
+
+'''
+包含数据跳过
+'''
 def skipInvolveDataNextIndex(index):
-    global hIndex,lIndex,high,low
-    h=high[index]
-    l=low[index]
+    global hIndexs,lIndexs,highs,lows
+    h=highs[index]
+    l=lows[index]
     index+=1
-    while high[index]<h and low[index]>l:
+    if len(highs)-1 == index or len(lows)-1 == index:
+        return None
+    while highs[index]<h and lows[index]>l:
         index+=1
     return index
+
+'''
+跳过x个包含数据
+'''
+def skipInvolveDataXIndex(index, x):
+    while x > 0:
+        index=skipInvolveDataNextIndex(index)
+        if index == None:
+            return None
+        x-=1
+    return index
+
+'''
+得到第一的索引及顶底标记
+'''
+#hl, index = getFirstIndex()
+
+'''
+获取下一个索引及顶底标记
+'''
+
+def findNextLowIndex(index):
+    global lIndexs
+    index+=1
+    if len(lIndexs)-1 >= index:
+        return lIndexs[index]
+    else:
+        return None
+def findNextHighIndex(index):
+    global hIndexs
+    index+=1
+    if len(hIndexs)-1 >= index:
+        return hIndexs[index]
+    else:
+        return None
     
+def compareBottomOrTopWithBefore(startIndex, endIndex, hl):
+    if hl == 'h':
+        x=0
+        #至少大于第四个不包含的数据的索引列表的索引
+        
+        while lIndexs[x]< endIndex:
+            x+=1
+            if len(lIndexs)-1<x:
+                return None, None
+        endIndex=lIndexs[x]
+        #循环检查数据
+        #step1检查在找到的索引期间是否存在更高的顶点
+        for i in range(startIndex,endIndex+1):
+            #print(i)
+            if highs[startIndex] < highs[i]:
+                return 'h',i
+        #step2检查在找到的索引期间是否存在比目标索引小的值，有的话跳下一个底索引进行比较
+        for i in range(startIndex,endIndex+1):
+            if lows[endIndex]>lows[i]:
+                
+                endIndex=findNextLowIndex(x)
+                if endIndex==None:
+                    return None,None
+                return compareBottomOrTopWithBefore(startIndex, endIndex, hl)
+        return 'l', endIndex
+    elif hl == 'l':
+        x=0
+        while hIndexs[x]<endIndex:
+            x+=1
+            if len(hIndexs)-1<x:
+                return None,None
+            
+        
+        endIndex=hIndexs[x]
+        for i in range(startIndex, endIndex+1):
+            if lows[startIndex] > lows[i]:
+                return 'l',i
+        for i in range(startIndex, endIndex+1):
+            if highs[endIndex]<highs[i]:
+                endIndex=findNextHighIndex(x)
+                if endIndex==None:
+                    return None, None
+                return compareBottomOrTopWithBefore(startIndex,endIndex,hl)
+        return 'h', endIndex
+        '''
+        x=0
+        while hIndexs[x]< endIndex:
+            x+=1
+        for i in range(hIndexs[x])[-(hIndexs[x]-startIndex):]:
+            if lows[startIndex] > low[i]:
+                return 'l',i
+            elif high[x]<high[i]:
+                #return getNextIndex('l', i)
+            return 'h', x
+        '''
+    
+def getNextIndex(hl,index):
+    global hIndex,lIndex,high,low
+    FdayInvolveIndex=skipInvolveDataXIndex(index, 4)
+    if FdayInvolveIndex == None:
+        return None,None
+    startIndex=index
+    return compareBottomOrTopWithBefore(startIndex, FdayInvolveIndex, hl)
+
+def findTopsAndBottoms(df):
+    df0 = pd.DataFrame()
+    hl, index = getFirstIndex(df)
+    i=0
+    while index <= max(lIndexs[-1],hIndexs[-1]):
+        df0.loc[i,'hl']=hl
+        df0.loc[i,'index']=index
+        hl,index=getNextIndex(hl,index)
+        if hl==None or index==None:
+            return df0
+        i+=1
+    return df0
+
+#df0=findTopsAndBottoms(df)
+
+def filterRepeatTopsAndBottomsData(df):
+    df0 = findTopsAndBottoms(df)
+    df1 = pd.DataFrame()
+    x = 0
+    while x <= df0.index.size:
+        if x==0:
+            df1=df0.loc[[0]]
+        else:
+            hl = df1.tail(1)['hl'].values[0]
+            index = df1.tail(1).index.values[0]
+            if hl == df0.loc[x, 'hl'].values[0]:
+                df1.loc[index] = df0.loc[x]
+        x+=1
+    return df1
+
+df1 =filterRepeatTopsAndBottomsData(df)
