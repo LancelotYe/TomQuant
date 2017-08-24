@@ -289,15 +289,38 @@ def filterRepeatTopsAndBottomsData(df):
     df0 = findTopsAndBottoms(df)
     df1 = pd.DataFrame()
     x = 0
-    while x <= df0.index.size:
+    while x <= df0.index.size-1:
         if x==0:
             df1=df0.loc[[0]]
         else:
             hl = df1.tail(1)['hl'].values[0]
             index = df1.tail(1).index.values[0]
-            if hl == df0.loc[x, 'hl'].values[0]:
+            if hl == df0.loc[x, 'hl']:
                 df1.loc[index] = df0.loc[x]
+            else:
+                df1=pd.concat([df1,df0.loc[[x]]],ignore_index=True)
         x+=1
     return df1
 
-df1 =filterRepeatTopsAndBottomsData(df)
+def connectfilterRepeatTopsAndBottomsDataWithDF(df):
+    #dataframe先根据时间排序
+    df=df.sort_values(by=['time'])
+    df=df.reset_index(drop=True)
+    df0=filterRepeatTopsAndBottomsData(df)
+    for i in range(df0.index.size):
+        hl = df0.loc[i,'hl']
+        index = int(df0.loc[i,'index'])
+        df0.loc[i,'time']=df.loc[index,'time']
+        if hl=='h':
+            df0.loc[i,'price']=df.loc[index,'high']
+        elif hl=='l':
+            df0.loc[i,'price']=df.loc[index,'low']
+    return df0
+#
+'''
+df
+df=df.sort_values(by=['time'])
+df=df.reset_index(drop=True)
+#df1 =filterRepeatTopsAndBottomsData(df)
+df1 = connectfilterRepeatTopsAndBottomsDataWithDF(df)
+'''

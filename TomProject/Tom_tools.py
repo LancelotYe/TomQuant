@@ -37,9 +37,9 @@ def gotoProjectPath():
     #tomMobileTank  
     #os.chdir('e:\\Users\\yjh19\\workspace\\TomQuant\\TomProject\\')
     #TomMacPro
-    #os.chdir('/Users/yejunhai/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomProject')
+    os.chdir('/Users/yejunhai/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomProject')
     #TomMacBookAir   
-    os.chdir('/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomProject/')
+    #os.chdir('/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomProject/')
     #TomMacPro
     #os.chdir('/Users/yejunhai/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomProject/')    
     #print('[+]ProjectPath : '+ os.getcwd())
@@ -187,6 +187,7 @@ def initHisTickToMinSelectFileWithCode(code,date,cycle):
 def selectOneStkCode(code,datastyle,date,cycle):
     remove(select_stk_code)
     df=readDf(stk_code)
+    code=int(code)
     df=df[df['code'].isin([code])]
     if df.size==0:
         print('No Such Code')

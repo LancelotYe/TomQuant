@@ -76,8 +76,12 @@ def format_date(x,pos=None):
 def getK_H(dif):
     x=0.15*dif+0.2
     x= x if x<2.0 else 2.0
-    print(x)
-    return x
+    if x < 1.0:
+        return 1.0
+    elif x > 1.5:
+        return 1.5
+    else:
+        return x
 
 def install_K_Data(r):
     quote=np.array([])
@@ -197,6 +201,39 @@ def tomdraw_P(rP):
     initRect(1.2,'P')
     drawLine(db_fig,rect_P,prices,format_date,'--','g','price')
     
+    
+    
+def install_HL_data(rP):
+    quote=np.array([])
+    df=tt.readDf(rP)
+    df=tst.connectfilterRepeatTopsAndBottomsDataWithDF(df)
+    for i in range(df.index.size):
+        _i = df.loc[i, 'index']
+        _p = df.loc[i, 'price']
+        qs=np.array([_i,_p])
+        if quote.size==0:
+            quote=qs
+        else:
+            quote=np.vstack((quote,qs))
+    return quote
+
+def tomdraw_HL(rP):
+    global rect_K
+    global db_fig
+    quote=install_HL_data(rP)
+    xs=[q[0] for q in quote]
+    ys=[q[1] for q in quote]
+    global rect_K
+    global db_fig
+    ax=db_fig.add_axes(rect_K)
+    plt.setp(ax.get_xticklabels(),rotation=30,horizontalalignment='right')
+    #,visible=True)
+    plt.plot(xs,ys,'r',label='HL',linewidth=1.5,ls='--')
+    plt.legend(loc='upper right')
+    #ax_vol.fill_between(index,volumes,color='coral')
+    ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_date))
+    
+    
 '''
 画均线和均线加速度
 '''
@@ -223,7 +260,7 @@ def tomdraw_M_Ac(rP,xdata,ls,colornum):
     drawLine(db_fig,rect_Ac,acs,format_date,ls,color,'acs'+str(xdata))
     tst.deleteMeanData(xdata,rP)
     
-    
+'''
 def install_XD_data(r):
     quote=np.array([])
     for t in db_r:
@@ -254,7 +291,10 @@ def tomdraw_XD(rP_XD):
     plt.legend(loc='upper right')
     #ax_vol.fill_between(index,volumes,color='coral')
     ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_date))
+'''
 
+
+    
 
 def tomdraw(rP,datastyle,means):
     global db_datastyle
@@ -264,6 +304,7 @@ def tomdraw(rP,datastyle,means):
         for mean in means:
             tomdraw_M_Ac(rP,mean,'--',means.index(mean))
         tomdraw_VA(rP)
+        tomdraw_HL(rP)
     elif datastyle=='hisTick' or datastyle=='realTick':
         tomdraw_P(rP)
         for mean in means:

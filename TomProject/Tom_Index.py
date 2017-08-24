@@ -15,13 +15,14 @@ import tushare as ts
 #td.removeStkFromFav('ALL')
 
 #test1
-startcode='603859'
+startcode='600259'
 cycle='01'
-date='2017-03-15'
+date='2017-03-10'
 datastyle='hisTickToMin'
 #hisCodeMinEndDate='2017-03-17'
 rP,df,fromDate,toDate,selectDF,datastyle=ta.readStk(datastyle,date,cycle,startcode)
 
+hldf=tst.filterRepeatTopsAndBottomsData(df)
 
 x=5
 x2=15
