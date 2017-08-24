@@ -16,13 +16,13 @@ import tushare as ts
 
 #test1
 startcode='600259'
-cycle='01'
+cycle='05'
 date='2017-03-10'
 datastyle='hisTickToMin'
 #hisCodeMinEndDate='2017-03-17'
 rP,df,fromDate,toDate,selectDF,datastyle=ta.readStk(datastyle,date,cycle,startcode)
 
-hldf=tst.filterRepeatTopsAndBottomsData(df)
+#hldf=tst.filterRepeatTopsAndBottomsData(df)
 
 x=5
 x2=15

@@ -168,6 +168,8 @@ def skipInvolveDataNextIndex(index):
     if len(highs)-1 == index or len(lows)-1 == index:
         return None
     while highs[index]<h and lows[index]>l:
+        if len(highs)-1 == index or len(lows)-1 == index:
+            return None
         index+=1
     return index
 
