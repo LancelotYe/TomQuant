@@ -301,9 +301,9 @@ def tomdraw(rP,datastyle,means):
     db_datastyle=datastyle
     if datastyle=='dayData' or datastyle=='hisTickToMin' or datastyle=='realTickToMin':
         tomdraw_K(rP)
-        for mean in means:
-            tomdraw_M_Ac(rP,mean,'--',means.index(mean))
-        tomdraw_VA(rP)
+        #for mean in means:
+            #tomdraw_M_Ac(rP,mean,'--',means.index(mean))
+        #tomdraw_VA(rP)
         tomdraw_HL(rP)
     elif datastyle=='hisTick' or datastyle=='realTick':
         tomdraw_P(rP)

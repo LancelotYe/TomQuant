@@ -15,9 +15,9 @@ import tushare as ts
 #td.removeStkFromFav('ALL')
 
 #test1
-startcode='600259'
-cycle='05'
-date='2017-03-10'
+startcode='600549'
+cycle='01'
+date='2017-03-20'
 datastyle='hisTickToMin'
 #hisCodeMinEndDate='2017-03-17'
 rP,df,fromDate,toDate,selectDF,datastyle=ta.readStk(datastyle,date,cycle,startcode)

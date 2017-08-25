@@ -225,9 +225,10 @@ def compareBottomOrTopWithBefore(startIndex, endIndex, hl):
             if highs[startIndex] < highs[i]:
                 return 'h',i
         #step2检查在找到的索引期间是否存在比目标索引小的值，有的话跳下一个底索引进行比较
-        for i in range(startIndex,endIndex+1):
+        for i in range(startIndex-1,endIndex+1):
+            if i<0:
+                continue
             if lows[endIndex]>lows[i]:
-                
                 endIndex=findNextLowIndex(x)
                 if endIndex==None:
                     return None,None
@@ -245,7 +246,9 @@ def compareBottomOrTopWithBefore(startIndex, endIndex, hl):
         for i in range(startIndex, endIndex+1):
             if lows[startIndex] > lows[i]:
                 return 'l',i
-        for i in range(startIndex, endIndex+1):
+        for i in range(startIndex-1, endIndex+1):
+            if i < 0:
+                continue
             if highs[endIndex]<highs[i]:
                 endIndex=findNextHighIndex(x)
                 if endIndex==None:
@@ -306,8 +309,7 @@ def filterRepeatTopsAndBottomsData(df):
 
 def connectfilterRepeatTopsAndBottomsDataWithDF(df):
     #dataframe先根据时间排序
-    df=df.sort_values(by=['time'])
-    df=df.reset_index(drop=True)
+    df=sortDfByOppositeIndex(df)
     df0=filterRepeatTopsAndBottomsData(df)
     for i in range(df0.index.size):
         hl = df0.loc[i,'hl']
@@ -326,3 +328,10 @@ df=df.reset_index(drop=True)
 #df1 =filterRepeatTopsAndBottomsData(df)
 df1 = connectfilterRepeatTopsAndBottomsDataWithDF(df)
 '''
+def sortDfByOppositeIndex(df):
+    df=df.sort_values(by=['time'])
+    df=df.reset_index(drop=True)
+    return df
+
+#df0 = connectfilterRepeatTopsAndBottomsDataWithDF(df)
+
