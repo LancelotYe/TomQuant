@@ -307,6 +307,9 @@ def filterRepeatTopsAndBottomsData(df):
         x+=1
     return df1
 
+'''
+0.1步找到笔的数据
+'''
 def connectfilterRepeatTopsAndBottomsDataWithDF(df):
     #dataframe先根据时间排序
     df=sortDfByOppositeIndex(df)
@@ -335,3 +338,38 @@ def sortDfByOppositeIndex(df):
 
 #df0 = connectfilterRepeatTopsAndBottomsDataWithDF(df)
 
+
+    
+
+    
+def findNextLineIndex(index, df):
+    hl = df.loc[index,'hl'];
+    for i in range(index, df.index.size):
+        if i-index>=3 and (i-index)%2==1:
+            if hl=='l':
+                if df.loc[i-2,'price']<=df.loc[i,'price']:
+                    if i+2>= df.index.size:
+                        return i
+                    if df.loc[i+2,'price']<=df.loc[i,'price']:
+                        return i
+            if hl=='h':
+                if df.loc[i-2,'price']>=df.loc[i,'price']:
+                    if i+2>= df.index.size:
+                        return i
+                    if df.loc[i+2,'price']>=df.loc[i,'price']:
+                        return i
+        else:
+            continue;
+            
+def findLineWithDF(df):
+    df0 = connectfilterRepeatTopsAndBottomsDataWithDF(df)
+    array = list()
+    index=0
+    while index != None:
+        array.append(index)
+        index = findNextLineIndex(index, df0)
+    df0=df0[df0.index.isin(array)]
+    df0=df0.reset_index(drop=True)
+    return df0
+    
+#df0 = findLineWithDF(df)

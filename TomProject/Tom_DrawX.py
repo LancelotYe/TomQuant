@@ -19,7 +19,7 @@ from matplotlib.dates import date2num
 import numpy as np
 
 
-db_x,db_y,db_w=0,0,2
+db_x,db_y,db_w=0,0,3
 db_fig=plt.figure()
 #rP='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/cn/day/603859.csv'
 #datastyle='dayData'
@@ -75,11 +75,10 @@ def format_date(x,pos=None):
 
 def getK_H(dif):
     x=0.15*dif+0.2
-    x= x if x<2.0 else 2.0
-    if x < 1.0:
-        return 1.0
-    elif x > 1.5:
-        return 1.5
+    if x < 0.5:
+        return 0.5
+    elif x > 1:
+        return 1
     else:
         return x
 
@@ -202,14 +201,33 @@ def tomdraw_P(rP):
     drawLine(db_fig,rect_P,prices,format_date,'--','g','price')
     
     
-    
+
+'''
+缠图
+'''
+
 def install_HL_data(rP):
     quote=np.array([])
     df=tt.readDf(rP)
-    df=tst.connectfilterRepeatTopsAndBottomsDataWithDF(df)
-    for i in range(df.index.size):
-        _i = df.loc[i, 'index']
-        _p = df.loc[i, 'price']
+    df0=tst.connectfilterRepeatTopsAndBottomsDataWithDF(df)
+    for i in range(df0.index.size):
+        _i = df0.loc[i, 'index']
+        _p = df0.loc[i, 'price']
+        qs=np.array([_i,_p])
+        if quote.size==0:
+            quote=qs
+        else:
+            quote=np.vstack((quote,qs))
+    return quote
+
+
+def install_Line_data(rP):
+    quote=np.array([])
+    df=tt.readDf(rP)
+    df0=tst.findLineWithDF(df)
+    for i in range(df0.index.size):
+        _i = df0.loc[i, 'index']
+        _p = df0.loc[i, 'price']
         qs=np.array([_i,_p])
         if quote.size==0:
             quote=qs
@@ -232,7 +250,22 @@ def tomdraw_HL(rP):
     plt.legend(loc='upper right')
     #ax_vol.fill_between(index,volumes,color='coral')
     ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_date))
-    
+
+def tomdraw_line(rP):
+    global rect_K
+    global db_fig
+    quote=install_Line_data(rP)
+    xs=[q[0] for q in quote]
+    ys=[q[1] for q in quote]
+    global rect_K
+    global db_fig
+    ax=db_fig.add_axes(rect_K)
+    plt.setp(ax.get_xticklabels(),rotation=30,horizontalalignment='right')
+    #,visible=True)
+    plt.plot(xs,ys,'y',label='Line',linewidth=1.5,ls='--')
+    plt.legend(loc='upper right')
+    #ax_vol.fill_between(index,volumes,color='coral')
+    ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_date))
     
 '''
 画均线和均线加速度
@@ -305,6 +338,7 @@ def tomdraw(rP,datastyle,means):
             #tomdraw_M_Ac(rP,mean,'--',means.index(mean))
         #tomdraw_VA(rP)
         tomdraw_HL(rP)
+        tomdraw_line(rP)
     elif datastyle=='hisTick' or datastyle=='realTick':
         tomdraw_P(rP)
         for mean in means:

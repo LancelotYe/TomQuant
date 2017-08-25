@@ -15,7 +15,8 @@ import tushare as ts
 #td.removeStkFromFav('ALL')
 
 #test1
-startcode='600549'
+'''
+startcode='600259'
 cycle='01'
 date='2017-03-20'
 datastyle='hisTickToMin'
@@ -32,7 +33,7 @@ tda.tomdraw(rP,datastyle,[x,x2,x3])
 
 df=tt.readDf(rP)
 
-
+'''
 
 
 
@@ -71,13 +72,15 @@ pd.read_csv(td.fav_stk_code,encoding='gbk')
 #td.transToMinWithTickSourceDir(tt.fav_stk_code,tt.his_tick_sourceDir,tt.outputMinDir,'2017-07-21','2017-07-24',['01'])
 
 #批量下载数据合并
-'''
-startdate='2017-08-01'
+
+startdate='2017-08-03'
 enddate='2017-08-07'
 code='600058'
 cycle='01'
+datastyle='hisTickToMin'
 td.mergeMinData(startdate,enddate,cycle,str(code))
-td.downAndMergeFavCodeMinData(startdate,enddate,[cycle])
-'''
+rP=td.downAndMergeFavCodeMinData(startdate,enddate,[cycle])[0]
+df=tt.readDf(rP)
+tda.tomdraw(rP,datastyle,[])
 
 #df=ts.get_tick_data('000001',date='2017-01-03')
