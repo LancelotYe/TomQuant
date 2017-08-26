@@ -372,4 +372,84 @@ def findLineWithDF(df):
     df0=df0.reset_index(drop=True)
     return df0
     
+def methodTest(df):
+    df0 = connectfilterRepeatTopsAndBottomsDataWithDF(df)
+    hDf=df0[df0['hl']=='h']
+    hDf=getLineHighDF(hDf)
+    lDf=df0[df0['hl']=='l']
+    lDf=getLineLowDF(lDf)
+    df0=pd.concat([hDf,lDf],ignore_index=True)
+    df0=df0.sort_values(by='index')
+    df0=df0.reset_index(drop=True)
+    return fliterHighAndLow(df0)
+    
+def fliterHighAndLow(df):
+    df1=pd.DataFrame()
+    index=0
+    while index<df.index.size:
+        df1=getNextHighLow(index,df,df1)
+        index+=1
+    return df1
+    
+def getNextHighLow(index, df,targetDf):
+    if index==0:
+        return df.loc[[index]]
+    else:
+        tailDf=targetDf.tail(1)
+        tailDf=tailDf.reset_index(drop=True)
+        prePrice=tailDf.loc[0,'price']
+        preHL=tailDf.loc[0,'hl']
+        price=df.loc[index,'price']
+        hl=df.loc[index,'hl']
+        if preHL=='h' and hl=='h':
+            if prePrice>=price:
+                return targetDf
+            elif prePrice<price:
+                targetDf=targetDf.head(targetDf.index.size-1)
+                targetDf=pd.concat([targetDf,df.loc[[index]]],ignore_index=True)
+                return targetDf
+        elif preHL=='h' and hl=='l':
+            targetDf=pd.concat([targetDf,df.loc[[index]]],ignore_index=True)
+            return targetDf
+        elif preHL=='l' and hl=='l':
+            if prePrice<=price:
+                return targetDf
+            elif prePrice>price:
+                targetDf=targetDf.head(targetDf.index.size-1)
+                targetDf=pd.concat([targetDf,df.loc[[index]]],ignore_index=True)
+                return targetDf
+        elif preHL=='l' and hl=='h':
+            targetDf=pd.concat([targetDf,df.loc[[index]]],ignore_index=True)
+            return targetDf
+    
+def getLineHighDF(df):
+    df=df.reset_index(drop=True)
+    df0=pd.DataFrame()
+    for i in range(df.index.size):
+        if 0<i<df.index.size-1:
+            if df.loc[i-1,'price']<=df.loc[i,'price'] and df.loc[i+1, 'price']<=df.loc[i,'price']:
+                df0=pd.concat([df0,df.loc[[i]]], ignore_index=True)
+        elif i==0:
+            if df.loc[i+1, 'price']<=df.loc[i,'price']:
+                df0=pd.concat([df0,df.loc[[i]]], ignore_index=True)
+        elif i==df.index.size-1:
+            if df.loc[i-1,'price']<=df.loc[i,'price']:
+                df0=pd.concat([df0,df.loc[[i]]], ignore_index=True)
+    return df0
+
+def getLineLowDF(df):
+    df=df.reset_index(drop=True)
+    df0=pd.DataFrame()
+    for i in range(df.index.size):
+        if 0<i<df.index.size-1:
+            if df.loc[i-1,'price']>=df.loc[i,'price'] and df.loc[i+1, 'price']>=df.loc[i,'price']:
+                df0=pd.concat([df0,df.loc[[i]]], ignore_index=True)
+        elif i==0:
+            if df.loc[i+1, 'price']>=df.loc[i,'price']:
+                df0=pd.concat([df0,df.loc[[i]]], ignore_index=True)
+        elif i==df.index.size-1:
+            if df.loc[i-1,'price']>=df.loc[i,'price']:
+                df0=pd.concat([df0,df.loc[[i]]], ignore_index=True)
+    return df0
 #df0 = findLineWithDF(df)
+#df0=methodTest(df)

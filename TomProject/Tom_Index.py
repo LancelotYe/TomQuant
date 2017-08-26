@@ -75,7 +75,7 @@ pd.read_csv(td.fav_stk_code,encoding='gbk')
 
 startdate='2017-08-03'
 enddate='2017-08-07'
-code='600058'
+code='000001'
 cycle='01'
 datastyle='hisTickToMin'
 td.mergeMinData(startdate,enddate,cycle,str(code))
