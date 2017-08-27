@@ -38,17 +38,6 @@ df=tt.readDf(rP)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 #plotList=['P']
 #tomdraw(code,readPath,datastyle, fromDate, toDate, plotList)
 #获取数据
@@ -73,14 +62,29 @@ pd.read_csv(td.fav_stk_code,encoding='gbk')
 
 #批量下载数据合并
 
+'''
+操作favList
+'''
+'''
+tt.getFavList()
+tt.removeStkFromFav(600058)
+tt.addStkCodesToFav([1])
+'''
+'''
+合并的分时数据分析
+'''
 startdate='2017-08-03'
 enddate='2017-08-07'
 code='000001'
 cycle='01'
-datastyle='hisTickToMin'
-td.mergeMinData(startdate,enddate,cycle,str(code))
+#datastyle='hisTickToMin'
+datastyle='hisTickToMinMerge'
+
+#td.mergeMinData(startdate,enddate,cycle,str(code))
 rP=td.downAndMergeFavCodeMinData(startdate,enddate,[cycle])[0]
 df=tt.readDf(rP)
 tda.tomdraw(rP,datastyle,[])
 
 #df=ts.get_tick_data('000001',date='2017-01-03')
+#df=tt.readDf('/Users/yejunhai/Desktop/sz000002_成交明细_2017-08-21.xls')
+#df=pd.read_excel('/Users/yejunhai/Desktop/sz000002_成交明细_2017-08-21.xls',sheetname=None ,skiprows=[0])

@@ -333,7 +333,7 @@ def tomdraw_XD(rP_XD):
 def tomdraw(rP,datastyle,means):
     global db_datastyle
     db_datastyle=datastyle
-    if datastyle=='dayData' or datastyle=='hisTickToMin' or datastyle=='realTickToMin':
+    if datastyle=='dayData' or datastyle=='hisTickToMin' or datastyle=='realTickToMin' or datastyle=='hisTickToMinMerge':
         tomdraw_K(rP)
         #for mean in means:
             #tomdraw_M_Ac(rP,mean,'--',means.index(mean))

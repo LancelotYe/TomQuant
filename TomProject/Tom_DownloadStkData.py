@@ -316,3 +316,4 @@ def downAndMergeFavCodeMinData(startDate,endDate,cycles):
             print(readPath)
             readPaths.append(readPath)
     return readPaths
+
