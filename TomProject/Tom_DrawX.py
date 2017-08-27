@@ -82,6 +82,9 @@ def getK_H(dif):
     else:
         return x
 
+'''
+数据初始化函数
+'''
 def install_K_Data(r):
     quote=np.array([])
     h=r.high.max()
@@ -141,13 +144,18 @@ def install_M_Data(r,xdata):
         else:
             quote=np.vstack((quote,qs))
     return quote
-        
+
+'''
+画图工具函数
+'''
+#K线图
 def draw_K(fig,rect,quote,width,func):
     ax_K=fig.add_axes(rect)
     candlestick_ochl(ax_K,quote,width=width,colorup='deeppink',colordown='c')
     ax_K.xaxis.set_major_formatter(ticker.FuncFormatter(func))
     plt.setp(ax_K.get_xticklabels(),rotation=30,horizontalalignment='right')
     plt.grid(True,which='minor',axis='y')
+#画连续数据，不包含很坐标
 def drawLine(fig,rect,ys,func,ls,color,label):
     ax=fig.add_axes(rect)
     plt.setp(ax.get_xticklabels(),rotation=0,horizontalalignment='right')
@@ -156,13 +164,22 @@ def drawLine(fig,rect,ys,func,ls,color,label):
     plt.legend(loc='upper right')
     #ax_vol.fill_between(index,volumes,color='coral')
     ax.xaxis.set_major_formatter(ticker.FuncFormatter(func))
+#画填充数据
 def drawFill(fig,rect,xs,ys,func,color):
     ax_prc=fig.add_axes(rect)
     plt.setp(ax_prc.get_xticklabels(),rotation=0,horizontalalignment='right')
     ax_prc.fill_between(xs,ys,color=color)
     ax_prc.xaxis.set_major_formatter(ticker.FuncFormatter(func))
-
-
+#画点和点之间的连线
+def drawPointConnect(fig,rect,xs,ys,func,ls,color,label):
+    ax=fig.add_axes(rect)
+    plt.setp(ax.get_xticklabels(),rotation=30,horizontalalignment='right')
+    plt.plot(xs,ys,color,label=label,linewidth=1.5,ls=ls)
+    plt.legend(loc='upper right')
+    ax.xaxis.set_major_formatter(ticker.FuncFormatter(func))
+'''
+画图操作函数
+'''
 def tomdraw_K(rP):
     global db_r
     global rect_K
@@ -201,73 +218,6 @@ def tomdraw_P(rP):
     drawLine(db_fig,rect_P,prices,format_date,'--','g','price')
     
     
-
-'''
-缠图
-'''
-
-def install_HL_data(rP):
-    quote=np.array([])
-    df=tt.readDf(rP)
-    df0=tst.connectfilterRepeatTopsAndBottomsDataWithDF(df)
-    for i in range(df0.index.size):
-        _i = df0.loc[i, 'index']
-        _p = df0.loc[i, 'price']
-        qs=np.array([_i,_p])
-        if quote.size==0:
-            quote=qs
-        else:
-            quote=np.vstack((quote,qs))
-    return quote
-
-
-def install_Line_data(rP):
-    quote=np.array([])
-    df=tt.readDf(rP)
-    #df0=tst.findLineWithDF(df)
-    df0=tst.methodTest(df)
-    for i in range(df0.index.size):
-        _i = df0.loc[i, 'index']
-        _p = df0.loc[i, 'price']
-        qs=np.array([_i,_p])
-        if quote.size==0:
-            quote=qs
-        else:
-            quote=np.vstack((quote,qs))
-    return quote
-
-def tomdraw_HL(rP):
-    global rect_K
-    global db_fig
-    quote=install_HL_data(rP)
-    xs=[q[0] for q in quote]
-    ys=[q[1] for q in quote]
-    global rect_K
-    global db_fig
-    ax=db_fig.add_axes(rect_K)
-    plt.setp(ax.get_xticklabels(),rotation=30,horizontalalignment='right')
-    #,visible=True)
-    plt.plot(xs,ys,'r',label='HL',linewidth=1.5,ls='--')
-    plt.legend(loc='upper right')
-    #ax_vol.fill_between(index,volumes,color='coral')
-    ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_date))
-
-def tomdraw_line(rP):
-    global rect_K
-    global db_fig
-    quote=install_Line_data(rP)
-    xs=[q[0] for q in quote]
-    ys=[q[1] for q in quote]
-    global rect_K
-    global db_fig
-    ax=db_fig.add_axes(rect_K)
-    plt.setp(ax.get_xticklabels(),rotation=30,horizontalalignment='right')
-    #,visible=True)
-    plt.plot(xs,ys,'y',label='Line',linewidth=1.5,ls='--')
-    plt.legend(loc='upper right')
-    #ax_vol.fill_between(index,volumes,color='coral')
-    ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_date))
-    
 '''
 画均线和均线加速度
 '''
@@ -293,6 +243,53 @@ def tomdraw_M_Ac(rP,xdata,ls,colornum):
     acs=[q[2] for q in quote]
     drawLine(db_fig,rect_Ac,acs,format_date,ls,color,'acs'+str(xdata))
     tst.deleteMeanData(xdata,rP)
+    
+    
+'''
+缠图模块(独立)
+'''
+
+
+def tomdraw_Pen(rP):
+    global rect_K
+    global db_fig
+    quote=install_chan_data(rP,tst.findPen)
+    xs=[q[0] for q in quote]
+    ys=[q[1] for q in quote]
+    global rect_K
+    global db_fig
+    drawPointConnect(db_fig,rect_K,xs,ys,format_date,'--','g','Pen')
+  
+
+
+def tomdraw_Line(rP):
+    global rect_K
+    global db_fig
+    quote=install_chan_data(rP,tst.findLine)
+    xs=[q[0] for q in quote]
+    ys=[q[1] for q in quote]
+    global rect_K
+    global db_fig
+    drawPointConnect(db_fig,rect_K,xs,ys,format_date,'--','y','Line')
+
+    
+    
+
+def install_chan_data(rP,chan_func):
+    quote=np.array([])
+    df=tt.readDf(rP)
+    #df0=tst.findLineWithDF(df)
+    df0=chan_func(df)
+    for i in range(df0.index.size):
+        _i = df0.loc[i, 'index']
+        _p = df0.loc[i, 'price']
+        qs=np.array([_i,_p])
+        if quote.size==0:
+            quote=qs
+        else:
+            quote=np.vstack((quote,qs))
+    return quote
+
     
 '''
 def install_XD_data(r):
@@ -328,8 +325,9 @@ def tomdraw_XD(rP_XD):
 '''
 
 
-    
-
+'''
+自动识别组合画图函数
+'''
 def tomdraw(rP,datastyle,means):
     global db_datastyle
     db_datastyle=datastyle
@@ -338,8 +336,8 @@ def tomdraw(rP,datastyle,means):
         #for mean in means:
             #tomdraw_M_Ac(rP,mean,'--',means.index(mean))
         #tomdraw_VA(rP)
-        tomdraw_HL(rP)
-        tomdraw_line(rP)
+        tomdraw_Pen(rP)
+        tomdraw_Line(rP)
     elif datastyle=='hisTick' or datastyle=='realTick':
         tomdraw_P(rP)
         for mean in means:

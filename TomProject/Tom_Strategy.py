@@ -4,18 +4,7 @@ import numpy as np
 import Tom_tools as tt
 import math
 
-'''
-rP='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/cn/day/603859.csv'
-df=tt.readDf(rP)
-df0=df.loc[0,'close']
 
-df020=df.head(20)
-closes=df.close
-
-
-closes
-x=getMean(closes)
-'''
 def getXdayMeanPrice(x,df,target):
     num=x
     numStr=str(num)
@@ -136,25 +125,6 @@ lIndexs=list()
 highs=list() 
 lows=list()
 
-def getFirstIndex(df):
-    global hIndexs,lIndexs,highs,lows
-    highs=df.high
-    lows=df.low
-    hIndexs=getTopIndex(highs)
-    lIndexs=getBottomIndex(lows)
-    #i=len(hIndexs)
-    #j=len(lIndexs)
-    #x = max(i,j)
-    i=0
-    while hIndexs[i]==lIndexs[i]:
-        i+=1
-    if hIndexs[i]>lIndexs[i]:
-            return 'l',i
-    elif lIndexs[i]>hIndexs[i]:
-            return 'h',i
-        
-
-
 
 
 '''
@@ -255,19 +225,37 @@ def compareBottomOrTopWithBefore(startIndex, endIndex, hl):
                     return None, None
                 return compareBottomOrTopWithBefore(startIndex,endIndex,hl)
         return 'h', endIndex
-        '''
-        x=0
-        while hIndexs[x]< endIndex:
-            x+=1
-        for i in range(hIndexs[x])[-(hIndexs[x]-startIndex):]:
-            if lows[startIndex] > low[i]:
-                return 'l',i
-            elif high[x]<high[i]:
-                #return getNextIndex('l', i)
-            return 'h', x
-        '''
     
-def getNextIndex(hl,index):
+    
+'''
+df根据时间升序排列
+'''
+def getRightIndexDF(df):
+    df=df.sort_values(by=['time'])
+    df=df.reset_index(drop=True)
+    return df
+'''
+0.1步找到笔的数据
+'''
+PEN_DF = pd.DataFrame()
+def getFirstPen(df):
+    global hIndexs,lIndexs,highs,lows
+    highs=df.high
+    lows=df.low
+    hIndexs=getTopIndex(highs)
+    lIndexs=getBottomIndex(lows)
+    #i=len(hIndexs)
+    #j=len(lIndexs)
+    #x = max(i,j)
+    i=0
+    while hIndexs[i]==lIndexs[i]:
+        i+=1
+    if hIndexs[i]>lIndexs[i]:
+            return 'l',i
+    elif lIndexs[i]>hIndexs[i]:
+            return 'h',i
+        
+def getNextPen(hl,index):
     global hIndex,lIndex,high,low
     FdayInvolveIndex=skipInvolveDataXIndex(index, 4)
     if FdayInvolveIndex == None:
@@ -275,23 +263,25 @@ def getNextIndex(hl,index):
     startIndex=index
     return compareBottomOrTopWithBefore(startIndex, FdayInvolveIndex, hl)
 
-def findTopsAndBottoms(df):
+def findAllPen(df):
+    global PEN_DF
     df0 = pd.DataFrame()
-    hl, index = getFirstIndex(df)
+    hl, index = getFirstPen(df)
     i=0
     while index <= max(lIndexs[-1],hIndexs[-1]):
         df0.loc[i,'hl']=hl
         df0.loc[i,'index']=index
-        hl,index=getNextIndex(hl,index)
+        hl,index=getNextPen(hl,index)
         if hl==None or index==None:
             return df0
         i+=1
-    return df0
+    PEN_DF=df0
+    return PEN_DF
 
 #df0=findTopsAndBottoms(df)
 
-def filterRepeatTopsAndBottomsData(df):
-    df0 = findTopsAndBottoms(df)
+def filterUsefulPen(df):
+    df0 = findAllPen(df)
     df1 = pd.DataFrame()
     x = 0
     while x <= df0.index.size-1:
@@ -307,13 +297,11 @@ def filterRepeatTopsAndBottomsData(df):
         x+=1
     return df1
 
-'''
-0.1步找到笔的数据
-'''
-def connectfilterRepeatTopsAndBottomsDataWithDF(df):
+
+def findPen(df):
     #dataframe先根据时间排序
-    df=sortDfByOppositeIndex(df)
-    df0=filterRepeatTopsAndBottomsData(df)
+    df=getRightIndexDF(df)
+    df0=filterUsefulPen(df)
     for i in range(df0.index.size):
         hl = df0.loc[i,'hl']
         index = int(df0.loc[i,'index'])
@@ -324,103 +312,13 @@ def connectfilterRepeatTopsAndBottomsDataWithDF(df):
             df0.loc[i,'price']=df.loc[index,'low']
     return df0
 #
+
+
+
 '''
-df
-df=df.sort_values(by=['time'])
-df=df.reset_index(drop=True)
-#df1 =filterRepeatTopsAndBottomsData(df)
-df1 = connectfilterRepeatTopsAndBottomsDataWithDF(df)
+找到线段数据
 '''
-def sortDfByOppositeIndex(df):
-    df=df.sort_values(by=['time'])
-    df=df.reset_index(drop=True)
-    return df
-
-#df0 = connectfilterRepeatTopsAndBottomsDataWithDF(df)
-
-
-    
-
-    
-def findNextLineIndex(index, df):
-    hl = df.loc[index,'hl'];
-    for i in range(index, df.index.size):
-        if i-index>=3 and (i-index)%2==1:
-            if hl=='l':
-                if df.loc[i-2,'price']<=df.loc[i,'price']:
-                    if i+2>= df.index.size:
-                        return i
-                    if df.loc[i+2,'price']<=df.loc[i,'price']:
-                        return i
-            if hl=='h':
-                if df.loc[i-2,'price']>=df.loc[i,'price']:
-                    if i+2>= df.index.size:
-                        return i
-                    if df.loc[i+2,'price']>=df.loc[i,'price']:
-                        return i
-        else:
-            continue;
-            
-def findLineWithDF(df):
-    df0 = connectfilterRepeatTopsAndBottomsDataWithDF(df)
-    array = list()
-    index=0
-    while index != None:
-        array.append(index)
-        index = findNextLineIndex(index, df0)
-    df0=df0[df0.index.isin(array)]
-    df0=df0.reset_index(drop=True)
-    return df0
-    
-def methodTest(df):
-    df0 = connectfilterRepeatTopsAndBottomsDataWithDF(df)
-    hDf=df0[df0['hl']=='h']
-    hDf=getLineHighDF(hDf)
-    lDf=df0[df0['hl']=='l']
-    lDf=getLineLowDF(lDf)
-    df0=pd.concat([hDf,lDf],ignore_index=True)
-    df0=df0.sort_values(by='index')
-    df0=df0.reset_index(drop=True)
-    return fliterHighAndLow(df0)
-    
-def fliterHighAndLow(df):
-    df1=pd.DataFrame()
-    index=0
-    while index<df.index.size:
-        df1=getNextHighLow(index,df,df1)
-        index+=1
-    return df1
-    
-def getNextHighLow(index, df,targetDf):
-    if index==0:
-        return df.loc[[index]]
-    else:
-        tailDf=targetDf.tail(1)
-        tailDf=tailDf.reset_index(drop=True)
-        prePrice=tailDf.loc[0,'price']
-        preHL=tailDf.loc[0,'hl']
-        price=df.loc[index,'price']
-        hl=df.loc[index,'hl']
-        if preHL=='h' and hl=='h':
-            if prePrice>=price:
-                return targetDf
-            elif prePrice<price:
-                targetDf=targetDf.head(targetDf.index.size-1)
-                targetDf=pd.concat([targetDf,df.loc[[index]]],ignore_index=True)
-                return targetDf
-        elif preHL=='h' and hl=='l':
-            targetDf=pd.concat([targetDf,df.loc[[index]]],ignore_index=True)
-            return targetDf
-        elif preHL=='l' and hl=='l':
-            if prePrice<=price:
-                return targetDf
-            elif prePrice>price:
-                targetDf=targetDf.head(targetDf.index.size-1)
-                targetDf=pd.concat([targetDf,df.loc[[index]]],ignore_index=True)
-                return targetDf
-        elif preHL=='l' and hl=='h':
-            targetDf=pd.concat([targetDf,df.loc[[index]]],ignore_index=True)
-            return targetDf
+LINE_DF=pd.DataFrame()
     
 def getLineHighDF(df):
     df=df.reset_index(drop=True)
@@ -451,5 +349,64 @@ def getLineLowDF(df):
             if df.loc[i-1,'price']>=df.loc[i,'price']:
                 df0=pd.concat([df0,df.loc[[i]]], ignore_index=True)
     return df0
-#df0 = findLineWithDF(df)
-#df0=methodTest(df)
+    
+def getNextLine(index, df,targetDf):
+    if index==0:
+        return df.loc[[index]]
+    else:
+        tailDf=targetDf.tail(1)
+        tailDf=tailDf.reset_index(drop=True)
+        prePrice=tailDf.loc[0,'price']
+        preHL=tailDf.loc[0,'hl']
+        price=df.loc[index,'price']
+        hl=df.loc[index,'hl']
+        if preHL=='h' and hl=='h':
+            if prePrice>=price:
+                return targetDf
+            elif prePrice<price:
+                targetDf=targetDf.head(targetDf.index.size-1)
+                targetDf=pd.concat([targetDf,df.loc[[index]]],ignore_index=True)
+                return targetDf
+        elif preHL=='h' and hl=='l':
+            targetDf=pd.concat([targetDf,df.loc[[index]]],ignore_index=True)
+            return targetDf
+        elif preHL=='l' and hl=='l':
+            if prePrice<=price:
+                return targetDf
+            elif prePrice>price:
+                targetDf=targetDf.head(targetDf.index.size-1)
+                targetDf=pd.concat([targetDf,df.loc[[index]]],ignore_index=True)
+                return targetDf
+        elif preHL=='l' and hl=='h':
+            targetDf=pd.concat([targetDf,df.loc[[index]]],ignore_index=True)
+            return targetDf
+
+def fliterUsefulLine(df):
+    df1=pd.DataFrame()
+    index=0
+    while index<df.index.size:
+        df1=getNextLine(index,df,df1)
+        index+=1
+    return df1
+
+def findLine(df):
+    global LINE_DF
+    global PEN_DF
+    df0 = findPen(df)
+    PEN_DF = df0
+    hDf=df0[df0['hl']=='h']
+    hDf=getLineHighDF(hDf)
+    lDf=df0[df0['hl']=='l']
+    lDf=getLineLowDF(lDf)
+    df0=pd.concat([hDf,lDf],ignore_index=True)
+    df0=df0.sort_values(by='index')
+    df0=df0.reset_index(drop=True)
+    LINE_DF=fliterUsefulLine(df0)
+    return LINE_DF
+'''
+找到中枢数据
+'''
+def findCenter(df):
+    df0=findLine(df)
+    
+
