@@ -19,7 +19,7 @@ from matplotlib.dates import date2num
 import numpy as np
 
 
-db_x,db_y,db_w=0,0,1.5
+db_x,db_y,db_w=0,0,2.7
 db_fig=plt.figure()
 #rP='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/cn/day/603859.csv'
 #datastyle='dayData'

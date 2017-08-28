@@ -304,6 +304,17 @@ def mergeMinData(startDate,endDate,cycle,code):
 
 #在操作该方法之前先添加收藏的股票代码到收藏文件
 def downAndMergeFavCodeMinData(startDate,endDate,cycles):
+    '''
+    readPath=tt.hisTickPath
+    dtime=tt.str2dateYmd(date)
+    getYM=tt.dateYm2str(dtime)
+    readPath=tt.joinPath(readPath,getYM,date+'_'+code+'.csv')
+    if not tt.isExist(readPath):
+        getPastTick(tt.select_stk_code,date,date)
+    '''
+        
+        
+        
     getPastTick(tt.fav_stk_code,startDate,endDate)
     transToMinWithTickSourceDir(tt.fav_stk_code,tt.his_tick_sourceDir,tt.outputMinDir,startDate,endDate,cycles)
      #转换完成以后才能合并所以不能合在一起
