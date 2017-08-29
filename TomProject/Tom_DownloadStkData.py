@@ -114,8 +114,7 @@ def getPastTick(StkSourcePath,startDate,endDate):
     qx.xday9k=endDate
     zwx.xtick_down8tim_all(qx, StkSourcePath)
     
-#getPastTick(stk_code,'2015-01-03','2015-03-04')
-#getPastTick(tt.select_stk_code,'2015-01-03','2016-03-04')
+
 #这个方法可以将任意tick数据转化成定制的
 def transfToMinWithTick(tickSourceFile, outputMinDir, cycles):
     rsk=outputMinDir
@@ -189,7 +188,9 @@ def getStkCodeHisTickData(code,date):
     #ttime=dtime+tt.one_Day_Delta
     #Tdate=tt.dateYmd2str(ttime)
     getYM=tt.dateYm2str(dtime)
-    readPath=tt.joinPath(readPath,getYM,date+'_'+code+'.csv')
+    code = str(code)
+    #readPath=tt.joinPath(readPath,getYM,date+'_'+code+'.csv')
+    readPath=os.path.join(readPath,getYM,date+'_'+code+'.csv')
     if not tt.isExist(readPath):
         getPastTick(tt.select_stk_code,date,date)
     '''
@@ -208,17 +209,20 @@ def getStkCodeHisTickData(code,date):
         toDate=date+' '+tdf.head(1)['time'].values[0]
         return readPath,tdf,fromDate,toDate,selecDF,datastyle
     except Exception as e:
-        os._exit(2011) 
+        #os._exit(2011) 
         #os.exit(123)
-    
+        print(date+' has no data')
+        return None,None,None,None,None,None
+
+
 def getStkCodeHisTickToMinData(code,date,cycle):
     cycleStr='M'+'%02d'%int(cycle)
     selecDF,datastyle=tt.initHisTickToMinSelectFileWithCode(code,date,cycle)
-    readPath=tt.joinPath(tt.hisTickToMinPath,date,cycleStr,code+'.csv')
+    readPath=tt.joinPath(tt.hisTickToMinPath,date,cycleStr,str(code)+'.csv')
     if not tt.isExist(readPath):
         xReadPath,xtdf,xfromDate,xtoDate,xSelectDF,xDatastyle=getStkCodeHisTickData(code,date)
         if xReadPath==None:
-            print('Can not find trans souce file')
+            print(str(code)+'at:'+date+' No Data')
             return
         if tt.isExist(xReadPath):
             selecDF,datastyle=tt.initHisTickToMinSelectFileWithCode(code,date,cycle)
@@ -229,8 +233,9 @@ def getStkCodeHisTickToMinData(code,date,cycle):
         toDate=date+' '+tdf.head(1)['time'].values[0]
         return readPath,tdf,fromDate,toDate,selecDF,datastyle
     else:
-        os._exit(2011) 
+        #os._exit(2011) 
         #os.exit(123)
+        print(date+' has no data')
     
     
     
@@ -296,7 +301,7 @@ def mergeMinData(startDate,endDate,cycle,code):
         return
     #outputPath=os.path.join(tt.hisCodeMinPath,cycle,code+'.csv')
     outputDir=tt.joinPath(tt.hisCodeMinPath,cycle)
-    readPath=tt.joinPath(outputDir,startDate+'-'+endDate+'-'+code+'.csv')
+    readPath=tt.joinPath(outputDir,code+'.csv')
     #tt.saveFileToDir(startDate+'-'+endDate+'-'+code+'.csv',outputDir,df)
     tt.saveDFNoIndex(readPath,df)
     return df,readPath
@@ -305,26 +310,33 @@ def mergeMinData(startDate,endDate,cycle,code):
 #在操作该方法之前先添加收藏的股票代码到收藏文件
 def downAndMergeFavCodeMinData(startDate,endDate,cycles):
     '''
-    readPath=tt.hisTickPath
+    
     dtime=tt.str2dateYmd(date)
     getYM=tt.dateYm2str(dtime)
     readPath=tt.joinPath(readPath,getYM,date+'_'+code+'.csv')
     if not tt.isExist(readPath):
         getPastTick(tt.select_stk_code,date,date)
     '''
-        
-        
-        
-    getPastTick(tt.fav_stk_code,startDate,endDate)
-    transToMinWithTickSourceDir(tt.fav_stk_code,tt.his_tick_sourceDir,tt.outputMinDir,startDate,endDate,cycles)
+    codes = tt.readDf(tt.fav_stk_code).code.values
+    #r=tt.hisTickPath
+    startD=tt.str2dateYmd(startDate)
+    endD=tt.str2dateYmd(endDate)
+    for code in codes:
+        for cycle in cycles:
+            while startD<=endD:
+                date=tt.dateYmd2str(startD)
+                getStkCodeHisTickToMinData(code,date,cycle)
+                startD += tt.one_Day_Delta        
      #转换完成以后才能合并所以不能合在一起
-    sdf=tt.getFavList()
-    selectCodes=sdf['code']
     readPaths=list()
-    for code in selectCodes:
+    for code in codes:
         for cycle in cycles:
             df,readPath=mergeMinData(startDate,endDate,cycle,str(code))
             print(readPath)
             readPaths.append(readPath)
     return readPaths
 
+def getFavLongTimeData(startDate,endDate,cycles):
+    #tt.removeStkFromFav('ALL')
+    #tt.addStkCodesToFav(codes)
+    return downAndMergeFavCodeMinData(startDate,endDate,cycles)

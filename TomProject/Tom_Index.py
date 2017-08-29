@@ -73,7 +73,7 @@ tt.addStkCodesToFav([600058])
 '''
 合并的分时数据分析
 '''
-startdate='2017-07-29'
+startdate='2017-07-01'
 enddate='2017-08-04'
 #code='000001'
 cycle='01'
@@ -81,7 +81,7 @@ cycle='01'
 datastyle='hisTickToMinMerge'
 
 #td.mergeMinData(startdate,enddate,cycle,str(code))
-rP=td.downAndMergeFavCodeMinData(startdate,enddate,[cycle])[0]
+rP=td.getFavLongTimeData(startdate,enddate,[cycle])[0]
 df=tt.readDf(rP)
 tda.tomdraw(rP,datastyle,[])
 
