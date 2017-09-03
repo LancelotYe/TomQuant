@@ -120,10 +120,10 @@ step2
 '''
 初始化起始值
 '''
-hIndexs=list()
-lIndexs=list() 
-highs=list() 
-lows=list()
+hIndexs=[]
+lIndexs=[]
+highs=[]
+lows=[]
 
 
 
@@ -237,7 +237,6 @@ def getRightIndexDF(df):
 '''
 0.1步找到笔的数据
 '''
-PEN_DF = pd.DataFrame()
 def getFirstPen(df):
     global hIndexs,lIndexs,highs,lows
     highs=df.high
@@ -264,7 +263,6 @@ def getNextPen(hl,index):
     return compareBottomOrTopWithBefore(startIndex, FdayInvolveIndex, hl)
 
 def findAllPen(df):
-    global PEN_DF
     df0 = pd.DataFrame()
     hl, index = getFirstPen(df)
     i=0
@@ -275,8 +273,7 @@ def findAllPen(df):
         if hl==None or index==None:
             return df0
         i+=1
-    PEN_DF=df0
-    return PEN_DF
+    return df0
 
 #df0=findTopsAndBottoms(df)
 
@@ -318,7 +315,6 @@ def findPen(df):
 '''
 找到线段数据
 '''
-LINE_DF=pd.DataFrame()
     
 def getLineHighDF(df):
     df=df.reset_index(drop=True)
@@ -389,24 +385,175 @@ def fliterUsefulLine(df):
         index+=1
     return df1
 
-def findLine(df):
-    global LINE_DF
-    global PEN_DF
-    df0 = findPen(df)
-    PEN_DF = df0
-    hDf=df0[df0['hl']=='h']
+def findLine(df0):
+    hDf=getHDF(df0)
     hDf=getLineHighDF(hDf)
-    lDf=df0[df0['hl']=='l']
+    lDf=getLDF(df0)
     lDf=getLineLowDF(lDf)
     df0=pd.concat([hDf,lDf],ignore_index=True)
     df0=df0.sort_values(by='index')
     df0=df0.reset_index(drop=True)
     LINE_DF=fliterUsefulLine(df0)
     return LINE_DF
+
+
 '''
 找到中枢数据
 '''
-def findCenter(df):
-    df0=findLine(df)
+def getSpan(df):
+    hdf=getHDF(df)
+    ldf=getLDF(df)
+    lineNum = len(df.index)-1
+    hIndex=0
+    lIndex=0
+    hl=whoseFirstIndexFront(hdf,ldf)
+    df0=pd.DataFrame()
+    df1=pd.DataFrame()
+    while lineNum>0:
+        spanH=hdf.loc[hIndex,'price']
+        spanL=ldf.loc[lIndex,'price']
+        span=spanH-spanL
+        if hl=='h':
+            #锁定跨度的x轴坐标
+            spanIndex=ldf.loc[lIndex,'index']
+            hIndex+=1
+        else:
+            spanIndex=hdf.loc[hIndex,'index']
+            lIndex+=1
+        
+        df0.loc[0,'spanIndex']=spanIndex
+        df0.loc[0,'span']=span
+        df0.loc[0,'spanL']=spanL
+        df0.loc[0,'spanH']=spanH
+        df1=pd.concat([df1,df0],ignore_index=True)
+        hl=switchHL(hl)
+        lineNum-=1
+    return df1
+def compareSpan(originSpan,targetSpan):
+    if originSpan.spanL>=targetSpan.spanL and originSpan.spanH<=targetSpan.spanH:
+        return True
+    else:
+        return False
+#判断一个span在spans中形成多少个连续的中枢,并返回这个中枢
+def spanTakeRoundToCenter(spanIndex,spanDf):
+    #先往后判断
+    startSpan=spanDf.loc[spanIndex]
+    startIndex=spanIndex
+    endIndex=spanIndex
+    toBackList=range(spanIndex,len(spanDf.index))
+    toFrontList=range(spanIndex)[::-1]
+    for index in toBackList:
+        targetSpan=spanDf.loc[index]
+        if not compareSpan(startSpan, targetSpan):
+            break
+        else:
+            endIndex=index
+
+    for index in toFrontList:
+       
+        targetSpan=spanDf.loc[index]
+        if not compareSpan(startSpan, targetSpan):
+            break
+        else:
+            startIndex=index
+    df=spanDf.loc[range(startIndex,endIndex+1)]
+    return df
+        
+
+def getMinSpanIndex(spandf):
+    minSpanIndex=spandf[spandf.span==min(spandf.span)].index.values[0]
+    return minSpanIndex
+
+def getSpanBlocks(spandf):
+    spandf0=spandf
+    #符合组合条件的span链接快
+    spanBlocks=[]
+    while spandf0.index.size>0:
+        minSpanIndex=getMinSpanIndex(spandf0)
+        dfx=spanTakeRoundToCenter(minSpanIndex,spandf)
+        indexs=dfx.index
+        for index in indexs:
+            if not index in spandf0.index:
+                indexs=np.delete(indexs,np.where(indexs==index),axis=0)
+        startIndex=min(indexs)
+        endIndex=max(indexs)
+        if len(range(startIndex,endIndex+1))>=3:
+            #构成中枢
+            dfx=dfx.loc[startIndex:endIndex]
+            #print(dfx.span)
+            dfx=dfx.reset_index(drop=True)
+            spanBlocks.append(dfx)
+        for i in range(startIndex,endIndex+1):
+            spandf0=spandf0.drop(i)
+    return spanBlocks
     
+def findCenter(linedf):
+    spandf=getSpan(linedf)
+    spanBlocks=getSpanBlocks(spandf)
+    #print(spanBlocks)
+    centerDf=pd.DataFrame()
+    for i in range(len(spanBlocks)):
+        sd=spanBlocks[i]
+        centerDf.loc[i,'startIndex']=sd.head(1).spanIndex.values[0]
+        centerDf.loc[i,'endIndex']=sd.tail(1).spanIndex.values[0]
+        centerDf.loc[i,'lowPrice']=max(sd.spanL)
+        centerDf.loc[i,'highPrice']=min(sd.spanH)
+    return centerDf
+
+
+
+
+'''
+创建类
+'''
+'''
+画图数据日期截取
+'''
+def clipMergeDFWithDate(df,sd,ed):
+    dates=tt.getNoWeekendDateList(sd,ed)
+    sd=dates[0]
+    ed=dates[-1]
+    sIndex=0
+    eIndex=0
+    for time in df.time.values:
+        if sd in time:
+            sIndex=df[df.time==time].index.values[0]
+                
+    for time in df.time.values:
+        if ed in time:
+            eIndex=df[df.time==time].index.values[0]
+            break
+    df=df.loc[eIndex:sIndex]
+    df=df.reset_index(drop=True)
+    return df
+    
+class Chan:
+    def __init__(self,rP,sd,ed):
+        self.rP=rP
+        df = tt.readDf(rP)
+        df=clipMergeDFWithDate(df,sd,ed)
+        self.pen_df=findPen(df)
+        self.line_df=findLine(self.pen_df)
+        self.center_df=findCenter(self.line_df)
+
+
+'''
+缠策略公用方法
+'''
+def switchHL(hl):
+    if hl=='h':
+        return 'l'
+    else:
+        return 'h'
+def whoseFirstIndexFront(hdf,ldf):
+    hindex=hdf.loc[0,'index']
+    lindex=ldf.loc[0,'index']
+    if hindex>lindex:
+        return 'l'
+    else:
+        return 'h'
+def getHDF(df):
+    return df[df.hl=='h'].reset_index(drop=True)
+def getLDF(df):
+    return df[df.hl=='l'].reset_index(drop=True)
 

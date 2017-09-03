@@ -19,7 +19,7 @@ from matplotlib.dates import date2num
 import numpy as np
 
 
-db_x,db_y,db_w=0,0,2.7
+db_x,db_y,db_w=0,0,2
 db_fig=plt.figure()
 #rP='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/cn/day/603859.csv'
 #datastyle='dayData'
@@ -75,10 +75,10 @@ def format_date(x,pos=None):
 
 def getK_H(dif):
     x=0.15*dif+0.2
-    if x < 0.5:
-        return 0.5
-    elif x > 1:
-        return 1
+    if x < 1.2:
+        return 1.2
+    elif x > 2.2:
+        return 2.2
     else:
         return x
 
@@ -191,6 +191,18 @@ def tomdraw_K(rP):
     initRect(k_h,'K')
     draw_K(db_fig,rect_K,quote,0.5,format_date)
     
+def tomdraw_KwithDate(rP,sd,ed):
+    global db_r
+    global rect_K
+    global db_fig
+    db_r=mlab.csv2rec(rP)
+    db_r=db_r[np.where(db_r.time>tt.str2dateYmd(sd))]
+    db_r=db_r[np.where(db_r.time<(tt.str2dateYmd(ed)+tt.one_Day_Delta))]
+    db_r.sort()
+    quote,dif=install_K_Data(db_r)
+    k_h=getK_H(dif)
+    initRect(k_h,'K')
+    draw_K(db_fig,rect_K,quote,0.5,format_date)
 
 def tomdraw_VA(rP):
     global db_r
@@ -250,10 +262,10 @@ def tomdraw_M_Ac(rP,xdata,ls,colornum):
 '''
 
 
-def tomdraw_Pen(rP):
+def tomdraw_Pen(pen_df):
     global rect_K
     global db_fig
-    quote=install_chan_data(rP,tst.findPen)
+    quote=install_chan_data(pen_df)
     xs=[q[0] for q in quote]
     ys=[q[1] for q in quote]
     global rect_K
@@ -262,24 +274,49 @@ def tomdraw_Pen(rP):
   
 
 
-def tomdraw_Line(rP):
+def tomdraw_Line(line_df,color):
     global rect_K
     global db_fig
-    quote=install_chan_data(rP,tst.findLine)
+    quote=install_chan_data(line_df)
     xs=[q[0] for q in quote]
     ys=[q[1] for q in quote]
     global rect_K
     global db_fig
-    drawPointConnect(db_fig,rect_K,xs,ys,format_date,'--','y','Line')
+    drawPointConnect(db_fig,rect_K,xs,ys,format_date,'--',color,'Line')
 
-    
-    
+def install_chanCenter_data(center_df):
+    centerPoints=[]
+    for i in range(center_df.index.size):
+        xS=center_df.loc[i,'startIndex']
+        xE=center_df.loc[i,'endIndex']
+        yL=center_df.loc[i,'lowPrice']
+        yH=center_df.loc[i,'highPrice']
+        pointL=[(xS,yL),(xS,yH),(xE,yH),(xE,yL),(xS,yL)]
+        centerPoints.append(pointL)
+    return centerPoints
 
-def install_chan_data(rP,chan_func):
+def tomedraw_center(center_df):
+    global rect_K
+    global db_fig
+    
+    centerPoints=install_chanCenter_data(center_df)
+    for points in centerPoints:
+        xs, ys = zip(*points)
+        #
+        #plt.plot(xs, ys, '-')
+        ax=db_fig.add_axes(rect_K)
+        plt.setp(ax.get_xticklabels(),rotation=30,horizontalalignment='right')
+        plt.plot(xs,ys,'blue',linewidth=1)
+        #plt.plot(xs,ys,'o')
+        plt.legend(loc='upper right')
+        ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_date))
+
+
+def install_chan_data(df0):
     quote=np.array([])
-    df=tt.readDf(rP)
+    #df=tt.readDf(rP)
     #df0=tst.findLineWithDF(df)
-    df0=chan_func(df)
+    #df0=chanInstance.chan_module
     for i in range(df0.index.size):
         _i = df0.loc[i, 'index']
         _p = df0.loc[i, 'price']
@@ -331,13 +368,13 @@ def tomdraw_XD(rP_XD):
 def tomdraw(rP,datastyle,means):
     global db_datastyle
     db_datastyle=datastyle
-    if datastyle=='dayData' or datastyle=='hisTickToMin' or datastyle=='realTickToMin' or datastyle=='hisTickToMinMerge':
+    if datastyle=='dayData' or datastyle=='hisTickToMin' or datastyle=='realTickToMin':
         tomdraw_K(rP)
-        #for mean in means:
-            #tomdraw_M_Ac(rP,mean,'--',means.index(mean))
+        for mean in means:
+            tomdraw_M_Ac(rP,mean,'--',means.index(mean))
         #tomdraw_VA(rP)
-        tomdraw_Pen(rP)
-        tomdraw_Line(rP)
+        #tomdraw_Pen(rP)
+        #tomdraw_Line(rP)
     elif datastyle=='hisTick' or datastyle=='realTick':
         tomdraw_P(rP)
         for mean in means:
@@ -346,10 +383,30 @@ def tomdraw(rP,datastyle,means):
 
 
 
-
-
-
-
+'''
+缠图像
+'''
+def tomdraw_chan(chanInstance):
+    global db_datastyle
+    db_datastyle='hisTickToMinMerge'
+    tomdraw_K(chanInstance.rP)
+    #tomdraw_Pen(chanInstance.pen_df)
+    tomdraw_Line(chanInstance.line_df,'red')
+    df=tst.findLine(chanInstance.line_df)
+    tomdraw_Line(df,'cyan')
+    tomdraw_Line(tst.findLine(df),'green')
+    
+    #tomedraw_center(chanInstance.center_df)
+def tomdraw_chan_withdate(chanInstance,sd,ed):
+    global db_datastyle
+    db_datastyle='hisTickToMinMerge'
+    tomdraw_KwithDate(chanInstance.rP,sd,ed)
+    #tomdraw_Pen(chanInstance.pen_df)
+    tomdraw_Line(chanInstance.line_df,'red')
+    df=tst.findLine(chanInstance.line_df)
+    tomdraw_Line(df,'cyan')
+    tomdraw_Line(tst.findLine(df),'green')
+    
 
 '''    
 rP_XD='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/tmp/600058.csv'

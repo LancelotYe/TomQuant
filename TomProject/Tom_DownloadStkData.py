@@ -5,7 +5,6 @@ import os,sys
 import numpy as np
 import pandas as pd
 import tushare as ts
-import tushare as ts
 import datetime as dt
 #  zwQuant
 import zwSys as zw  
@@ -13,7 +12,7 @@ import zwQTBox as zwx
 import zwTools as zwt
 
 import Tom_tools as tt
-
+from time import ctime,sleep
 
 '''
 基础文件数据
@@ -101,14 +100,6 @@ def getTodayTickAndCycle(StkSourcePath, cycles):
 历史Tick数据
 '''
 def getPastTick(StkSourcePath,startDate,endDate):
-    #testfinx='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/Base/stk_test.csv'
-    #testfinx='/Users/tom/Library/Mobile Documents/com~apple~CloudDocs/Documents/TomLearning/Python/QuantTrade/TomQuant/TomQuantData/Base/stk_code.csv'
-    #qx = zw.zwDatX(zw._rdatMin)
-    #qx.xday0k='2016-01-01'
-    #qx.xday9k='2017-07-20'
-    #qx.xdayNum=2
-    #zwx.xtick_down8tim_all(qx, testfinx)
-    #qx = zw.zwDatX(zw._rdatMin)
     qx=zw.zwDatX(tt.hisTickPath)
     qx.xday0k=startDate
     qx.xday9k=endDate
@@ -123,7 +114,7 @@ def transfToMinWithTick(tickSourceFile, outputMinDir, cycles):
     qx.min_ksgns=cycles
     zwx.xtick2tim100(qx,tickSourceFile)
     zwx.xtick2minWr(qx,rsk)
-
+    
 
 
     
@@ -137,8 +128,6 @@ def transfToMinWithTick(tickSourceFile, outputMinDir, cycles):
     
 #获取code从starttime起的日数据
 def getStkCodeDayDate(code,startTime):
-    #readPath=os.path.join(dayDataPath,code+'.csv')
-    #selectDF=selectOneStkCode(code,datastyle,date,cycle)
     selectDF,datastyle=tt.initDatDateSelectFileWithCode(code,startTime)
     readPath=tt.joinPath(tt.dayDataDir,code+'.csv')
     if os.path.exists(readPath)==False:
@@ -181,49 +170,31 @@ def getStkCodeTodayMinData(code,cycle):
     toDate=tt.today_Date_Ymd_Str+' '+tdf.head(1)['time'].values[0]
     return readPath,tdf,fromDate,toDate,selectDF,datastyle
 
+
 def getStkCodeHisTickData(code,date):
     selecDF,datastyle=tt.initHisTickSelectFileWithCode(code,date)
-    readPath=tt.hisTickPath
-    dtime=tt.str2dateYmd(date)
-    #ttime=dtime+tt.one_Day_Delta
-    #Tdate=tt.dateYmd2str(ttime)
-    getYM=tt.dateYm2str(dtime)
-    code = str(code)
-    #readPath=tt.joinPath(readPath,getYM,date+'_'+code+'.csv')
-    readPath=os.path.join(readPath,getYM,date+'_'+code+'.csv')
+    readPath=tt.getHisTickCodePath(code,date)
     if not tt.isExist(readPath):
+        print('Date:'+date+' Code:'+str(code)+' is saving...')
         getPastTick(tt.select_stk_code,date,date)
-    '''
-    if tt.isExist(readPath):
-        tdf=tt.readDf(readPath)
-        fromDate=date+' '+tdf.tail(1)['time'].values[0]
-        toDate=date+' '+tdf.head(1)['time'].values[0]
-        return readPath,tdf,fromDate,toDate,selecDF,datastyle
-    else:
-        print('No data')
-        pass
-    '''
     try:
         tdf=tt.readDf(readPath)
         fromDate=date+' '+tdf.tail(1)['time'].values[0]
         toDate=date+' '+tdf.head(1)['time'].values[0]
         return readPath,tdf,fromDate,toDate,selecDF,datastyle
     except Exception as e:
-        #os._exit(2011) 
-        #os.exit(123)
         print(date+' has no data')
         return None,None,None,None,None,None
 
 
 def getStkCodeHisTickToMinData(code,date,cycle):
-    cycleStr='M'+'%02d'%int(cycle)
     selecDF,datastyle=tt.initHisTickToMinSelectFileWithCode(code,date,cycle)
-    readPath=tt.joinPath(tt.hisTickToMinPath,date,cycleStr,str(code)+'.csv')
+    readPath=tt.getHisTickToMinCodePath(code,date,cycle)
     if not tt.isExist(readPath):
         xReadPath,xtdf,xfromDate,xtoDate,xSelectDF,xDatastyle=getStkCodeHisTickData(code,date)
         if xReadPath==None:
-            print(str(code)+'at:'+date+' No Data')
-            return
+            print(str(code)+'at:'+date+' No HisTick Data')
+            return None,None,None,None,None,None
         if tt.isExist(xReadPath):
             selecDF,datastyle=tt.initHisTickToMinSelectFileWithCode(code,date,cycle)
             transfToMinWithTick(xReadPath,tt.joinPath(tt.outputMinDir,date),[cycle])
@@ -233,8 +204,6 @@ def getStkCodeHisTickToMinData(code,date,cycle):
         toDate=date+' '+tdf.head(1)['time'].values[0]
         return readPath,tdf,fromDate,toDate,selecDF,datastyle
     else:
-        #os._exit(2011) 
-        #os.exit(123)
         print(date+' has no data')
     
     
@@ -274,65 +243,111 @@ def transToMinWithTickSourceDir(baseCodefile,tickSourceDir,outputMinDir,startDat
    
 #批量下载才允许合并
 def mergeMinData(startDate,endDate,cycle,code):
-    #sd=dt.datetime.strptime(startDate,'%Y-%m-%d')
-    sd=tt.str2dateYmd(startDate)
-    #ed=dt.datetime.strptime(endDate,'%Y-%m-%d')
-    ed=tt.str2dateYmd(endDate)
     df=pd.DataFrame()
     #cycle=1
-    cycle='M'+'%02d' %int(cycle)
+    #cycle='M'+'%02d' %int(cycle)
     code='%06d' %int(code)
-    while(sd<=ed):
-        #datestr=dt.datetime.strftime(ed,'%Y-%m-%d')
-        datestr=tt.dateYmd2str(ed)
-        hisMinFilePath=os.path.join(tt.outputMinDir,datestr,cycle,code+'.csv')
+    dl=tt.getNoWeekendDateList(startDate,endDate)
+    dl=dl[::-1]
+    for date in dl:
+        #hisMinFilePath=os.path.join(tt.hisTickToMinPath,date,cycle,code+'.csv')
+        hisMinFilePath=tt.getHisTickToMinCodePath(code,date,cycle)
         if tt.isExist(hisMinFilePath):
-            #print(hisMinFilePath)
-            df0=pd.read_csv(hisMinFilePath, encoding='gbk')
+            df0=tt.readDf(hisMinFilePath)
             for i in range(df0.index.size):
-                df0.at[i,'time']=datestr+''+str(df0.loc[i,'time'])
-            if df.size<5:
+                df0.loc[i,'time']=date+''+str(df0.loc[i,'time'])
+            if df.size<10:
                 df=df0
             else:
                 df=pd.concat([df,df0],ignore_index=True)
-        ed-=tt.one_Day_Delta
-    if df.size==0:
-        print('No Data')
-        return
+    if df.size == 0:
+        print('[-]Error:No Data????Code:'+code+'startDate:'+startDate+'endDate:'+endDate+'cycle:'+cycle+' date:'+date)
+        return None,None
     #outputPath=os.path.join(tt.hisCodeMinPath,cycle,code+'.csv')
     outputDir=tt.joinPath(tt.hisCodeMinPath,cycle)
     readPath=tt.joinPath(outputDir,code+'.csv')
     #tt.saveFileToDir(startDate+'-'+endDate+'-'+code+'.csv',outputDir,df)
     tt.saveDFNoIndex(readPath,df)
     return df,readPath
-    
 
+
+#批量下载才允许合并
+def mergeMinDataX(startDate,endDate,cycle,code):
+    df=pd.DataFrame()
+    code='%06d' %int(code)
+    readPath=tt.getHisTickToMinMergeCodePath(code,cycle)
+    dl=tt.getNoWeekendDateList(startDate,endDate)
+    dl=dl[::-1]
+    if tt.isExist(readPath):
+        #获取原来文件存在的日期
+        existDates=[]
+        df=tt.readDf(readPath)
+        times=df.time
+        for time in times:
+            time=(tt.str2dateYmdHMS(time))
+            time=tt.dateYmd2str(time)
+            if len(existDates)==0:
+                existDates.append(time)
+            else:
+                if not existDates[-1]==time:
+                    existDates.append(time)
+        existDates.sort(reverse=True)
+        
+        #先判断merge数据中存在date日期否
+        for date in dl:
+            if date in existDates:
+                continue
+            else:
+                hisMinFilePath=tt.getHisTickToMinCodePath(code,date,cycle)
+                #hisMinFilePath=tt.getHisTickToMinMergeCodePath(code,cycle)
+                if tt.isExist(hisMinFilePath):
+                    df0=tt.readDf(hisMinFilePath)
+                    for i in range(df0.index.size):
+                        df0.loc[i,'time']=date+''+str(df0.loc[i,'time'])
+                    if df.size<10:
+                        df=df0
+                    else:
+                        df=pd.concat([df,df0],ignore_index=True)
+        df=df.sort_values(by='time',ascending=False)
+        df=df.reset_index(drop=True)
+        
+    else:
+        for date in dl:
+            hisMinFilePath=tt.getHisTickToMinCodePath(code,date,cycle)
+            if tt.isExist(hisMinFilePath):
+                df0=tt.readDf(hisMinFilePath)
+                for i in range(df0.index.size):
+                    df0.loc[i,'time']=date+''+str(df0.loc[i,'time'])
+                if df.size<10:
+                    df=df0
+                else:
+                    df=pd.concat([df,df0],ignore_index=True)
+        if df.size == 0:
+            print('[-]Error:No Data????Code:'+code+'startDate:'+startDate+'endDate:'+endDate+'cycle:'+cycle+' date:'+date)
+            return None,None
+    #readPath=tt.getHisTickToMinMergeCodePath(code,cycle)
+    #tt.saveFileToDir(startDate+'-'+endDate+'-'+code+'.csv',outputDir,df)
+    tt.saveDFNoIndex(readPath,df)
+    return df,readPath
+    
+#智能判断下载股票代码并转化分时
+def downCode(code,startDate,endDate,cycles):
+    dl=tt.getNoWeekendDateList(startDate,endDate)
+    for cycle in cycles:
+        for date in dl:
+            getStkCodeHisTickToMinData(code,date,cycle)
+                
 #在操作该方法之前先添加收藏的股票代码到收藏文件
 def downAndMergeFavCodeMinData(startDate,endDate,cycles):
-    '''
-    
-    dtime=tt.str2dateYmd(date)
-    getYM=tt.dateYm2str(dtime)
-    readPath=tt.joinPath(readPath,getYM,date+'_'+code+'.csv')
-    if not tt.isExist(readPath):
-        getPastTick(tt.select_stk_code,date,date)
-    '''
     codes = tt.readDf(tt.fav_stk_code).code.values
-    #r=tt.hisTickPath
-    startD=tt.str2dateYmd(startDate)
-    endD=tt.str2dateYmd(endDate)
     for code in codes:
-        for cycle in cycles:
-            while startD<=endD:
-                date=tt.dateYmd2str(startD)
-                getStkCodeHisTickToMinData(code,date,cycle)
-                startD += tt.one_Day_Delta        
+        downCode(code,startDate,endDate,cycles)
      #转换完成以后才能合并所以不能合在一起
     readPaths=list()
     for code in codes:
+        code='%06d' %int(code)
         for cycle in cycles:
-            df,readPath=mergeMinData(startDate,endDate,cycle,str(code))
-            print(readPath)
+            df,readPath=mergeMinDataX(startDate,endDate,cycle,code)
             readPaths.append(readPath)
     return readPaths
 
@@ -340,3 +355,66 @@ def getFavLongTimeData(startDate,endDate,cycles):
     #tt.removeStkFromFav('ALL')
     #tt.addStkCodesToFav(codes)
     return downAndMergeFavCodeMinData(startDate,endDate,cycles)
+
+
+
+'''
+单个数据下载
+'''
+def downHisTickDate(code,dateStr):
+    dtime=tt.str2dateYmd(dateStr)
+    getYM=tt.dateYm2str(dtime)
+    getYMD=dateStr
+    readPath=tt.hisTickPath
+    code='%06d'%int(code)
+    readPath=os.path.join(readPath,getYM,getYMD+'_'+code+'.csv')
+    if not tt.isExist(readPath):
+        if tt.isWeekEnd(getYMD):
+            print('[*] '+code+''+getYMD + ' is Weekend ')
+            return
+        df=downHisTickData(code,getYMD)
+        if len(df)<10:
+            print('[-] '+code+''+getYMD + ' have no Data ')
+            return
+        else:
+            print('[+] '+code+''+getYMD+' is Saving... ')
+            tt.saveDFNoIndex(readPath,df)
+    else:
+        print('[+] '+code+''+getYMD+ ' is Exist ')
+'''
+批量本地判断下载历史分时数据
+'''
+def downHisFavTickDatasJudgeLocal(startDate,endDate):
+    sd=tt.str2dateYmd(startDate)
+    ed=tt.str2dateYmd(endDate)
+    codes=tt.getFavList().code
+    while sd<=ed:
+        dateStr=tt.dateYmd2str(sd)
+        for code in codes:
+            downHisTickDate(code,dateStr)
+        sd+=tt.one_Day_Delta
+        
+downloadNum = 0
+def downHisTickData(code,date):
+    global downloadNum
+    df,dn=pd.DataFrame(),0
+    try:
+        df = ts.get_tick_data(code,date=date)    #print(df.head())
+    except IOError: 
+        pass    #skip,error 
+    if type(df)==type(None):
+        df=pd.DataFrame()
+    dn=len(df)
+    # print('     n',dn,ftg) # 跳过无数据 日期
+    #if zwt.xin(dn,0,9):print('n2',dn,ftg) 
+    if dn>10:  
+        df['type']=df['type'].str.replace(u'中性盘', 'norm');
+        df['type']=df['type'].str.replace(u'买盘', 'buy');
+        df['type']=df['type'].str.replace(u'卖盘', 'sell');
+        downloadNum+=1
+        if downloadNum>=5:
+            downloadNum=0
+            sleep(20)
+    return df
+
+#df=downHisTickData('000001', '2017-08-05')

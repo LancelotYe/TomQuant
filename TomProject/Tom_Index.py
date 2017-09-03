@@ -16,9 +16,9 @@ import tushare as ts
 
 #test1
 '''
-startcode='600259'
+startcode='000002'
 cycle='01'
-date='2017-03-20'
+date='2017-08-04'
 datastyle='hisTickToMin'
 #hisCodeMinEndDate='2017-03-17'
 rP,df,fromDate,toDate,selectDF,datastyle=ta.readStk(datastyle,date,cycle,startcode)
@@ -67,23 +67,39 @@ pd.read_csv(td.fav_stk_code,encoding='gbk')
 '''
 '''
 tt.getFavList()
-tt.removeStkFromFav(1)
-tt.addStkCodesToFav([600058])
+tt.removeStkFromFav('ALL')
+tt.addStkCodesToFav([603968])
 '''
+#tt.readDf(tt.stk_code)
 '''
 合并的分时数据分析
 '''
-startdate='2017-07-01'
-enddate='2017-08-04'
+startdate='2017-04-28'
+enddate='2017-08-15'
 #code='000001'
 cycle='01'
 #datastyle='hisTickToMin'
 datastyle='hisTickToMinMerge'
 
 #td.mergeMinData(startdate,enddate,cycle,str(code))
+
+#tt.strDateYmdAddDelta(startdate,tt.ten_Days_Delta)
+
 rP=td.getFavLongTimeData(startdate,enddate,[cycle])[0]
-df=tt.readDf(rP)
-tda.tomdraw(rP,datastyle,[])
+#readPath=tt.getHisTickToMinMergeCodePath(600058,1)
+
+
+
+#df=tt.readDf(rP)
+
+sd='2017-04-28'
+ed='2017-08-30'
+chan=tst.Chan(rP,sd,ed)
+
+#tda.tomdraw_chan(chan)
+tda.tomdraw_chan_withdate(chan,sd,ed)
+#tda.tomdraw_KwithDate(rP,sd,ed)
+#tda.tomdraw(rP,datastyle,[])
 
 #df=ts.get_tick_data('000001',date='2017-01-03')
 #df=tt.readDf('/Users/yejunhai/Desktop/sz000002_成交明细_2017-08-21.xls')

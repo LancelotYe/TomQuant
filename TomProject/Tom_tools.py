@@ -2,6 +2,26 @@
 import os ,sys
 import datetime as dt
 import pandas as pd
+import time
+
+def isWeekEnd(date):
+    day=time.strptime(date,'%Y-%m-%d')
+    day=time.strftime('%a',day)
+    if day == 'Sun' or day == 'Sat':
+        return True
+    else:
+        return False
+    
+def getNoWeekendDateList(startDate,endDate):
+    dateList=[]
+    sd=str2dateYmd(startDate)
+    ed=str2dateYmd(endDate)
+    while sd<=ed:
+        date=dateYmd2str(sd)
+        if not isWeekEnd(date):
+            dateList.append(date)
+        sd+=one_Day_Delta
+    return dateList
 
 def dateYm2str(date):
     return dt.datetime.strftime(date,'%Y-%m')
@@ -18,7 +38,13 @@ def str2dateYmd(dateStr):
 def str2dateYmdHMS(dateStr):
     return dt.datetime.strptime(dateStr,'%Y-%m-%d %H:%M:%S')
 
+def strDateYmdAddDelta(dateStr,delta):
+    endD=str2dateYmd(dateStr)+delta
+    return dateYmd2str(endD)
+
 one_Day_Delta=dt.timedelta(days=1)
+ten_Days_Delta=dt.timedelta(days=10)
+fifteen_Days_delta=dt.timedelta(days=15)
 today_Date=dt.datetime.now()
 today_Date_Ymd_Str=dateYmd2str(today_Date)
 today_Date_YmdHMS_Str=dateYmdHMS2str(today_Date)
@@ -111,6 +137,26 @@ outputMinDir=joinPath(_rdatCN,'hisTickToMin')
 
 endTradeTime='15:00:00'
 
+def getHisTickCodePath(code,date):
+    code='%06d'%int(code)
+    readPath=hisTickPath
+    dtime=str2dateYmd(date)
+    getYM=dateYm2str(dtime)
+    readPath=joinPath(readPath,getYM,date+'_'+code+'.csv')
+    return readPath
+
+def getHisTickToMinCodePath(code,date,cycle):
+    code='%06d'%int(code)
+    cycleStr='M'+'%02d'%int(cycle)
+    readPath=joinPath(hisTickToMinPath,date,cycleStr,code+'.csv')
+    return readPath
+
+def getHisTickToMinMergeCodePath(code,cycle):
+    code='%06d'%int(code)
+    cycleStr='M'+'%02d'%int(cycle)
+    readPath=joinPath(hisCodeMinPath,cycleStr,code+'.csv')
+    return readPath
+    
 def readDf(path):
     if isExist(path):
         df=pd.read_csv(path,encoding='gbk')
@@ -119,10 +165,16 @@ def readDf(path):
         print('No such file')
 
 def saveDf(filePath,df):
-    df.to_csv(filePath,encoding='gbk')
+    try:
+        df.to_csv(filePath,encoding='gbk',index=False)
+    except Exception as e:
+        print(e)
     
 def saveDFNoIndex(filePath,df):
-    df.to_csv(filePath,encoding='gbk',index=False)
+    fileName=filePath.split(os.sep)[-1]
+    dirPath=filePath.replace(fileName,'')
+    #df.to_csv(filePath,encoding='gbk',index=False)
+    saveFileToDir(fileName,dirPath,df)
 
 def saveFileToDir(fileName,dirPath,df):
     if not isExist(dirPath):
@@ -276,7 +328,7 @@ def addStkCodesToFav(codeList):
             df=df[df.duplicated()==False].sort_values(by='code')
         saveDFNoIndex(fav_stk_code,df)
         #df.to_csv(fav_stk_code,index=False,encoding='gbk',date_format='str')
-        return df
+        return getFavList()
     else:
         print('can not add this stk code')
         return
